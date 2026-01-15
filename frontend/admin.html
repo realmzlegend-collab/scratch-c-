@@ -1,0 +1,2897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Scratch C</title>
+    <style>
+        :root {
+            --gold: #FFD700;
+            --black: #000000;
+            --wine: #722F37;
+            --red: #FF0000;
+            --green: #00FF00;
+            --blue: #0000FF;
+            --yellow: #FFFF00;
+            --bg-dark: #121212;
+            --bg-light: #1E1E1E;
+            --text-light: #FFFFFF;
+            --text-gray: #AAAAAA;
+            --admin-red: #8B0000;
+            --admin-blue: #1E3A8A;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .admin-navbar {
+            background: linear-gradient(90deg, var(--admin-red), var(--admin-blue));
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.7);
+            border-bottom: 3px solid var(--gold);
+        }
+        
+        .admin-logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--gold), var(--yellow));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .admin-badge {
+            background: var(--red);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        .admin-nav-links {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .admin-nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+        
+        .admin-nav-link:hover, .admin-nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--gold);
+        }
+        
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .admin-notification {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--red);
+            color: white;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .admin-logout {
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .admin-container {
+            padding-top: 70px;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .admin-sidebar {
+            width: 250px;
+            background: var(--admin-blue);
+            position: fixed;
+            top: 70px;
+            left: 0;
+            bottom: 0;
+            overflow-y: auto;
+            border-right: 2px solid var(--gold);
+            padding: 20px 0;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+        
+        .sidebar-title {
+            color: var(--gold);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .menu-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-light);
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255, 215, 0, 0.2);
+            color: var(--gold);
+            border-left: 3px solid var(--gold);
+        }
+        
+        .menu-badge {
+            margin-left: auto;
+            background: var(--red);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+        }
+        
+        .admin-main {
+            flex: 1;
+            margin-left: 250px;
+            padding: 30px;
+            background: var(--bg-dark);
+            min-height: calc(100vh - 70px);
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, var(--admin-red), var(--admin-blue));
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 2px solid var(--gold);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .admin-header::before {
+            content: '⚙️';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 4rem;
+            opacity: 0.1;
+        }
+        
+        .admin-title {
+            color: var(--gold);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .admin-subtitle {
+            color: var(--text-gray);
+            font-size: 1rem;
+        }
+        
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--bg-light);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid var(--wine);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.1);
+        }
+        
+        .stat-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2.5rem;
+            opacity: 0.3;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--gold);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+        
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .change-up {
+            color: var(--green);
+        }
+        
+        .change-down {
+            color: var(--red);
+        }
+        
+        .admin-section {
+            background: var(--bg-light);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--wine);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            color: var(--gold);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .admin-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--green), var(--blue));
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, var(--gold), var(--yellow));
+            color: var(--black);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(45deg, var(--red), var(--wine));
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(45deg, var(--green), #006400);
+            color: white;
+        }
+        
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .admin-table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--wine);
+        }
+        
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        
+        .admin-table th {
+            background: var(--admin-blue);
+            color: var(--gold);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--gold);
+        }
+        
+        .admin-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--wine);
+        }
+        
+        .admin-table tr:hover {
+            background: rgba(255, 215, 0, 0.05);
+        }
+        
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .status-active {
+            background: rgba(0, 255, 0, 0.2);
+            color: var(--green);
+        }
+        
+        .status-inactive {
+            background: rgba(255, 0, 0, 0.2);
+            color: var(--red);
+        }
+        
+        .status-pending {
+            background: rgba(255, 215, 0, 0.2);
+            color: var(--yellow);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .action-edit {
+            background: rgba(0, 123, 255, 0.2);
+            color: #007bff;
+        }
+        
+        .action-delete {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+        
+        .action-verify {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+        }
+        
+        .action-disable {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .admin-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--gold);
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            background: var(--black);
+            border: 1px solid var(--wine);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+        
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            grid-column: 1 / -1;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+        
+        .chart-container {
+            background: var(--black);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid var(--wine);
+        }
+        
+        .chart-title {
+            color: var(--gold);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .chart-placeholder {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-gray);
+            font-size: 1.2rem;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+        
+        .quick-action {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .quick-action:hover {
+            border-color: var(--gold);
+            transform: translateY(-5px);
+        }
+        
+        .action-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .action-text {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        .logs-container {
+            max-height: 400px;
+            overflow-y: auto;
+            background: var(--black);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid var(--wine);
+        }
+        
+        .log-entry {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border-left: 4px solid var(--green);
+        }
+        
+        .log-error {
+            border-left-color: var(--red);
+        }
+        
+        .log-warning {
+            border-left-color: var(--yellow);
+        }
+        
+        .log-info {
+            border-left-color: var(--blue);
+        }
+        
+        .log-time {
+            color: var(--text-gray);
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .log-message {
+            color: var(--text-light);
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: var(--bg-light);
+            border-radius: 20px;
+            border: 2px solid var(--gold);
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 25px 30px;
+            border-bottom: 1px solid var(--wine);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            color: var(--gold);
+            font-size: 1.5rem;
+        }
+        
+        .close-modal {
+            background: var(--red);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: var(--gold);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-gray);
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--wine);
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+        
+        .page-btn {
+            padding: 10px 20px;
+            background: var(--bg-light);
+            border: 1px solid var(--wine);
+            color: var(--text-light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .page-btn.active, .page-btn:hover {
+            background: var(--wine);
+            color: var(--gold);
+            border-color: var(--gold);
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 15px;
+            background: var(--black);
+            border: 1px solid var(--wine);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+        
+        .search-button {
+            background: var(--gold);
+            color: var(--black);
+            border: none;
+            padding: 0 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .filter-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            background: var(--black);
+            border: 1px solid var(--wine);
+            color: var(--text-light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--wine);
+            color: var(--gold);
+            border-color: var(--gold);
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        
+        @media (max-width: 1200px) {
+            .admin-sidebar {
+                width: 70px;
+                padding: 20px 0;
+            }
+            
+            .admin-main {
+                margin-left: 70px;
+            }
+            
+            .sidebar-section {
+                padding: 0 10px;
+            }
+            
+            .sidebar-title, .menu-text {
+                display: none;
+            }
+            
+            .menu-item {
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            .menu-badge {
+                display: none;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .admin-navbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .admin-nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .admin-container {
+                padding-top: 120px;
+            }
+            
+            .admin-sidebar {
+                top: 120px;
+                width: 100%;
+                height: 60px;
+                bottom: auto;
+                display: flex;
+                overflow-x: auto;
+                padding: 10px;
+            }
+            
+            .admin-main {
+                margin-left: 0;
+                margin-top: 60px;
+                padding: 20px;
+            }
+            
+            .sidebar-section {
+                margin-bottom: 0;
+                padding: 0 10px;
+                display: flex;
+            }
+            
+            .sidebar-menu {
+                display: flex;
+                gap: 10px;
+            }
+            
+            .menu-item {
+                padding: 10px 15px;
+                white-space: nowrap;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Admin Navbar -->
+    <nav class="admin-navbar">
+        <div class="admin-logo">
+            Scratch C <span class="admin-badge">ADMIN</span>
+        </div>
+        
+        <div class="admin-nav-links">
+            <a href="/dashboard" class="admin-nav-link">
+                👤 User View
+            </a>
+            <div class="admin-user">
+                <div class="admin-notification">
+                    🔔
+                    <span class="notification-badge">3</span>
+                </div>
+                <button class="admin-logout" onclick="logout()">
+                    🚪 Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Admin Container -->
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Dashboard</div>
+                <ul class="sidebar-menu">
+                    <li class="menu-item active" onclick="showSection('overview')">
+                        📊 Overview
+                    </li>
+                    <li class="menu-item" onclick="showSection('analytics')">
+                        📈 Analytics
+                        <span class="menu-badge">New</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Users</div>
+                <ul class="sidebar-menu">
+                    <li class="menu-item" onclick="showSection('users')">
+                        👥 All Users
+                        <span class="menu-badge" id="usersCount">0</span>
+                    </li>
+                    <li class="menu-item" onclick="showSection('verification')">
+                        ✅ Verification
+                        <span class="menu-badge" id="pendingVerification">0</span>
+                    </li>
+                    <li class="menu-item" onclick="showSection('referrals')">
+                        👥 Referrals
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Content</div>
+                <ul class="sidebar-menu">
+                    <li class="menu-item" onclick="showSection('cinema')">
+                        🎬 Cinema
+                        <span class="menu-badge" id="moviesCount">0</span>
+                    </li>
+                    <li class="menu-item" onclick="showSection('books')">
+                        📚 Books
+                        <span class="menu-badge" id="booksCount">0</span>
+                    </li>
+                    <li class="menu-item" onclick="showSection('marketplace')">
+                        🛍️ Marketplace
+                        <span class="menu-badge" id="listingsCount">0</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Financial</div>
+                <ul class="sidebar-menu">
+                    <li class="menu-item" onclick="showSection('earnings')">
+                        💰 Earnings
+                    </li>
+                    <li class="menu-item" onclick="showSection('withdrawals')">
+                        💸 Withdrawals
+                        <span class="menu-badge" id="pendingWithdrawals">0</span>
+                    </li>
+                    <li class="menu-item" onclick="showSection('transactions')">
+                        💳 Transactions
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-title">Settings</div>
+                <ul class="sidebar-menu">
+                    <li class="menu-item" onclick="showSection('announcements')">
+                        📢 Announcements
+                    </li>
+                    <li class="menu-item" onclick="showSection('text-commands')">
+                        ⌨️ Text Commands
+                    </li>
+                    <li class="menu-item" onclick="showSection('system')">
+                        ⚙️ System Settings
+                    </li>
+                    <li class="menu-item" onclick="showSection('logs')">
+                        📋 System Logs
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <!-- Overview Section -->
+            <div id="overviewSection">
+                <div class="admin-header">
+                    <h1 class="admin-title">Admin Dashboard</h1>
+                    <p class="admin-subtitle">Total control and management of Scratch C platform</p>
+                </div>
+                
+                <!-- Stats -->
+                <div class="admin-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-number" id="totalUsers">0</div>
+                        <div class="stat-label">Total Users</div>
+                        <div class="stat-change change-up">↑ 12% this week</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-number" id="totalEarnings">₦0</div>
+                        <div class="stat-label">Platform Earnings (20%)</div>
+                        <div class="stat-change change-up">↑ 8% today</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">🎬</div>
+                        <div class="stat-number" id="totalMovies">0</div>
+                        <div class="stat-label">Movies</div>
+                        <div class="stat-change change-up">↑ 3 new</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-number" id="totalBooks">0</div>
+                        <div class="stat-label">Books</div>
+                        <div class="stat-change change-up">↑ 5 new</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">🛍️</div>
+                        <div class="stat-number" id="activeListings">0</div>
+                        <div class="stat-label">Active Listings</div>
+                        <div class="stat-change change-down">↓ 2 sold</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-number" id="tasksCompleted">0</div>
+                        <div class="stat-label">Tasks Completed</div>
+                        <div class="stat-change change-up">↑ 45 today</div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h2 class="section-title">⚡ Quick Actions</h2>
+                    </div>
+                    
+                    <div class="quick-actions">
+                        <div class="quick-action" onclick="openAddMovie()">
+                            <div class="action-icon">🎬</div>
+                            <div class="action-text">Add New Movie</div>
+                        </div>
+                        
+                        <div class="quick-action" onclick="openAddBook()">
+                            <div class="action-icon">📚</div>
+                            <div class="action-text">Add New Book</div>
+                        </div>
+                        
+                        <div class="quick-action" onclick="showSection('announcements')">
+                            <div class="action-icon">📢</div>
+                            <div class="action-text">Send Announcement</div>
+                        </div>
+                        
+                        <div class="quick-action" onclick="showSection('withdrawals')">
+                            <div class="action-icon">💰</div>
+                            <div class="action-text">Process Withdrawals</div>
+                        </div>
+                        
+                        <div class="quick-action" onclick="openTextCommand()">
+                            <div class="action-icon">⌨️</div>
+                            <div class="action-text">Create Text Command</div>
+                        </div>
+                        
+                        <div class="quick-action" onclick="showSection('logs')">
+                            <div class="action-icon">📋</div>
+                            <div class="action-text">View System Logs</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h2 class="section-title">📝 Recent Activity</h2>
+                        <button class="admin-btn btn-secondary" onclick="showSection('logs')">
+                            View All
+                        </button>
+                    </div>
+                    
+                    <div class="logs-container">
+                        <div class="log-entry">
+                            <div class="log-time">Just now</div>
+                            <div class="log-message">New user registered: john_doe</div>
+                        </div>
+                        <div class="log-entry">
+                            <div class="log-time">5 minutes ago</div>
+                            <div class="log-message">Withdrawal processed: ₦5,000 to user jane_smith</div>
+                        </div>
+                        <div class="log-entry log-info">
+                            <div class="log-time">30 minutes ago</div>
+                            <div class="log-message">New movie uploaded: "The Great Adventure"</div>
+                        </div>
+                        <div class="log-entry log-warning">
+                            <div class="log-time">1 hour ago</div>
+                            <div class="log-message">User mike123 reported for suspicious activity</div>
+                        </div>
+                        <div class="log-entry">
+                            <div class="log-time">2 hours ago</div>
+                            <div class="log-message">Platform earnings: ₦12,500 from 50 tasks</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Users Section -->
+            <div id="usersSection" class="hidden">
+                <div class="admin-header">
+                    <h1 class="admin-title">👥 User Management</h1>
+                    <p class="admin-subtitle">Manage all users, verify accounts, and control access</p>
+                </div>
+                
+                <!-- Search and Filter -->
+                <div class="search-box">
+                    <input type="text" id="userSearch" class="search-input" placeholder="Search users by username, email, or ID...">
+                    <button class="search-button" onclick="searchUsers()">
+                        🔍 Search
+                    </button>
+                </div>
+                
+                <div class="filter-options">
+                    <button class="filter-btn active" onclick="filterUsers('all')">All Users</button>
+                    <button class="filter-btn" onclick="filterUsers('active')">Active</button>
+                    <button class="filter-btn" onclick="filterUsers('inactive')">Inactive</button>
+                    <button class="filter-btn" onclick="filterUsers('verified')">Verified</button>
+                    <button class="filter-btn" onclick="filterUsers('unverified')">Unverified</button>
+                    <button class="filter-btn" onclick="filterUsers('recent')">Recent</button>
+                </div>
+                
+                <!-- Users Table -->
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h2 class="section-title">User List</h2>
+                        <div class="section-actions">
+                            <button class="admin-btn btn-primary" onclick="exportUsers()">
+                                📥 Export CSV
+                            </button>
+                            <button class="admin-btn btn-secondary" onclick="refreshUsers()">
+                                🔄 Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-table-container">
+                        <table class="admin-table" id="usersTable">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Balance</th>
+                                    <th>Joined</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <tr>
+                                    <td colspan="6" class="loading">Loading users...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="pagination" id="usersPagination">
+                        <!-- Pagination will be generated here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cinema Section -->
+            <div id="cinemaSection" class="hidden">
+                <div class="admin-header">
+                    <h1 class="admin-title">🎬 Cinema Management</h1>
+                    <p class="admin-subtitle">Upload movies, manage voting, and control cinema schedule</p>
+                </div>
+                
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Movie Management</h2>
+                        <div class="section-actions">
+                            <button class="admin-btn btn-primary" onclick="openAddMovie()">
+                                🎬 Add Movie
+                            </button>
+                            <button class="admin-btn btn-secondary" onclick="refreshMovies()">
+                                🔄 Refresh
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="admin-table-container">
+                        <table class="admin-table" id="moviesTable">
+                            <thead>
+                                <tr>
+                                    <th>Movie</th>
+                                    <th>Genre</th>
+                                    <th>Votes</th>
+                                    <th>Status</th>
+                                    <th>Schedule</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="moviesTableBody">
+                                <tr>
+                                    <td colspan="6" class="loading">Loading movies...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Cinema Controls -->
+                <div class="admin-section">
+                    <h2 class="section-title">🎛️ Cinema Controls</h2>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-top: 25px;">
+                        <div>
+                            <h3 style="color: var(--gold); margin-bottom: 15px;">Cinema Status</h3>
+                            <div style="display: flex; gap: 15px; align-items: center;">
+                                <div style="font-size: 2rem;">🎬</div>
+                                <div>
+                                    <div style="font-weight: bold; color: var(--green);">Cinema is OPEN</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Users can watch movies</div>
+                                </div>
+                                <button class="admin-btn btn-danger" onclick="toggleCinemaStatus()" style="margin-left: auto;">
+                                    Close Cinema
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 style="color: var(--gold); margin-bottom: 15px;">Voting System</h3>
+                            <div style="display: flex; gap: 15px; align-items: center;">
+                                <div style="font-size: 2rem;">🗳️</div>
+                                <div>
+                                    <div style="font-weight: bold; color: var(--green);">Voting is ACTIVE</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Users can vote for movies</div>
+                                </div>
+                                <button class="admin-btn btn-danger" onclick="toggleVotingStatus()" style="margin-left: auto;">
+                                    Disable Voting
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Upload Movie Form -->
+                <div class="admin-section" id="uploadMovieForm" style="display: none;">
+                    <h2 class="section-title">🎬 Upload New Movie</h2>
+                    
+                    <form id="movieForm" onsubmit="addMovie(event)">
+                        <div class="admin-form">
+                            <div class="form-group">
+                                <label class="form-label">Movie Title *</label>
+                                <input type="text" id="movieTitle" class="form-control" placeholder="Enter movie title" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Genre *</label>
+                                <select id="movieGenre" class="form-control" required>
+                                    <option value="">Select Genre</option>
+                                    <option value="action">Action</option>
+                                    <option value="comedy">Comedy</option>
+                                    <option value="drama">Drama</option>
+                                    <option value="romance">Romance</option>
+                                    <option value="thriller">Thriller</option>
+                                    <option value="horror">Horror</option>
+                                    <option value="sci-fi">Sci-Fi</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Description *</label>
+                                <textarea id="movieDescription" class="form-control" placeholder="Enter movie description" required></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Duration</label>
+                                <input type="text" id="movieDuration" class="form-control" placeholder="e.g., 2h 15min">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Director</label>
+                                <input type="text" id="movieDirector" class="form-control" placeholder="Enter director name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Google Drive Link *</label>
+                                <input type="url" id="movieDriveLink" class="form-control" placeholder="https://drive.google.com/..." required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Thumbnail URL</label>
+                                <input type="url" id="movieThumbnail" class="form-control" placeholder="https://example.com/thumbnail.jpg">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Schedule Date</label>
+                                <input type="datetime-local" id="movieSchedule" class="form-control">
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="admin-btn btn-success">
+                                    🎬 Upload Movie
+                                </button>
+                                <button type="button" class="admin-btn btn-danger" onclick="closeMovieForm()">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Announcements Section -->
+            <div id="announcementsSection" class="hidden">
+                <div class="admin-header">
+                    <h1 class="admin-title">📢 Announcements</h1>
+                    <p class="admin-subtitle">Send announcements to all users or specific groups</p>
+                </div>
+                
+                <div class="admin-section">
+                    <h2 class="section-title">Create Announcement</h2>
+                    
+                    <form id="announcementForm" onsubmit="sendAnnouncement(event)">
+                        <div class="admin-form">
+                            <div class="form-group">
+                                <label class="form-label">Title *</label>
+                                <input type="text" id="announcementTitle" class="form-control" placeholder="Enter announcement title" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Message *</label>
+                                <textarea id="announcementMessage" class="form-control" placeholder="Enter your announcement message..." rows="5" required></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Target Audience *</label>
+                                <select id="announcementTarget" class="form-control" required>
+                                    <option value="all">All Users</option>
+                                    <option value="verified">Verified Users Only</option>
+                                    <option value="unverified">Unverified Users Only</option>
+                                    <option value="active">Active Users (Last 7 days)</option>
+                                    <option value="inactive">Inactive Users</option>
+                                    <option value="specific">Specific User IDs</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" id="specificUsersGroup" style="display: none;">
+                                <label class="form-label">User IDs (comma-separated)</label>
+                                <input type="text" id="specificUserIds" class="form-control" placeholder="user123, user456, user789">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Display Page</label>
+                                <select id="announcementPage" class="form-control">
+                                    <option value="dashboard">Dashboard</option>
+                                    <option value="cinema">Cinema</option>
+                                    <option value="marketplace">Marketplace</option>
+                                    <option value="reading">Reading</option>
+                                    <option value="profile">Profile</option>
+                                    <option value="all">All Pages</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Priority</label>
+                                <select id="announcementPriority" class="form-control">
+                                    <option value="normal">Normal</option>
+                                    <option value="high">High (Popup)</option>
+                                    <option value="urgent">Urgent (Forced)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="admin-btn btn-success">
+                                    📢 Send Announcement
+                                </button>
+                                <button type="button" class="admin-btn btn-secondary" onclick="previewAnnouncement()">
+                                    👁️ Preview
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Previous Announcements -->
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Previous Announcements</h2>
+                        <button class="admin-btn btn-secondary" onclick="refreshAnnouncements()">
+                            🔄 Refresh
+                        </button>
+                    </div>
+                    
+                    <div class="logs-container" id="announcementsList">
+                        <div class="loading">Loading announcements...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Text Commands Section -->
+            <div id="textCommandsSection" class="hidden">
+                <div class="admin-header">
+                    <h1 class="admin-title">⌨️ Text Commands</h1>
+                    <p class="admin-subtitle">Create text commands that trigger actions when users type them</p>
+                </div>
+                
+                <div class="admin-section">
+                    <h2 class="section-title">Create Text Command</h2>
+                    
+                    <form id="commandForm" onsubmit="createCommand(event)">
+                        <div class="admin-form">
+                            <div class="form-group">
+                                <label class="form-label">Command Trigger *</label>
+                                <input type="text" id="commandTrigger" class="form-control" placeholder="e.g., /help, !bonus, #support" required>
+                                <small style="color: var(--text-gray); display: block; margin-top: 5px;">Users type this to trigger the command</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Action Type *</label>
+                                <select id="commandAction" class="form-control" required onchange="toggleCommandFields()">
+                                    <option value="">Select Action</option>
+                                    <option value="message">Send Message</option>
+                                    <option value="reward">Give Reward</option>
+                                    <option value="redirect">Redirect to URL</option>
+                                    <option value="disable">Disable User Account</option>
+                                    <option value="verify">Verify User Account</option>
+                                    <option value="add_balance">Add Balance</option>
+                                    <option value="custom">Custom JavaScript</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" id="commandMessageField">
+                                <label class="form-label">Response Message</label>
+                                <textarea id="commandMessage" class="form-control" placeholder="Message to send when command is triggered"></textarea>
+                            </div>
+                            
+                            <div class="form-group" id="commandRewardField" style="display: none;">
+                                <label class="form-label">Reward Amount (₦)</label>
+                                <input type="number" id="commandReward" class="form-control" placeholder="Enter reward amount">
+                            </div>
+                            
+                            <div class="form-group" id="commandUrlField" style="display: none;">
+                                <label class="form-label">Redirect URL</label>
+                                <input type="url" id="commandUrl" class="form-control" placeholder="https://example.com">
+                            </div>
+                            
+                            <div class="form-group" id="commandBalanceField" style="display: none;">
+                                <label class="form-label">Balance to Add (₦)</label>
+                                <input type="number" id="commandBalance" class="form-control" placeholder="Enter amount to add">
+                            </div>
+                            
+                            <div class="form-group" id="commandCustomField" style="display: none;">
+                                <label class="form-label">Custom JavaScript Code</label>
+                                <textarea id="commandCustom" class="form-control" placeholder="Write JavaScript code to execute" rows="6"></textarea>
+                                <small style="color: var(--text-gray); display: block; margin-top: 5px;">Use `user` variable for current user object</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Access Level</label>
+                                <select id="commandAccess" class="form-control">
+                                    <option value="all">All Users</option>
+                                    <option value="verified">Verified Users Only</option>
+                                    <option value="admin">Admins Only</option>
+                                    <option value="specific">Specific Users</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">
+                                    <input type="checkbox" id="commandActive" checked>
+                                    <span style="margin-left: 8px;">Command is active</span>
+                                </label>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="admin-btn btn-success">
+                                    💾 Save Command
+                                </button>
+                                <button type="button" class="admin-btn btn-secondary" onclick="testCommand()">
+                                    🧪 Test Command
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Existing Commands -->
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Existing Commands</h2>
+                        <button class="admin-btn btn-secondary" onclick="refreshCommands()">
+                            🔄 Refresh
+                        </button>
+                    </div>
+                    
+                    <div class="admin-table-container">
+                        <table class="admin-table" id="commandsTable">
+                            <thead>
+                                <tr>
+                                    <th>Trigger</th>
+                                    <th>Action</th>
+                                    <th>Access</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="commandsTableBody">
+                                <tr>
+                                    <td colspan="6" class="loading">Loading commands...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System Logs Section -->
+            <div id="logsSection" class="hidden">
+                <div class="admin-header">
+                    <h1 class="admin-title">📋 System Logs</h1>
+                    <p class="admin-subtitle">Monitor system activities, errors, and user actions</p>
+                </div>
+                
+                <div class="admin-section">
+                    <div class="section-header">
+                        <h2 class="section-title">System Logs</h2>
+                        <div class="section-actions">
+                            <button class="admin-btn btn-danger" onclick="clearLogs()">
+                                🗑️ Clear Logs
+                            </button>
+                            <button class="admin-btn btn-secondary" onclick="refreshLogs()">
+                                🔄 Refresh
+                            </button>
+                            <button class="admin-btn btn-primary" onclick="exportLogs()">
+                                📥 Export Logs
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-options">
+                        <button class="filter-btn active" onclick="filterLogs('all')">All Logs</button>
+                        <button class="filter-btn" onclick="filterLogs('error')">Errors</button>
+                        <button class="filter-btn" onclick="filterLogs('warning')">Warnings</button>
+                        <button class="filter-btn" onclick="filterLogs('info')">Info</button>
+                        <button class="filter-btn" onclick="filterLogs('user')">User Actions</button>
+                        <button class="filter-btn" onclick="filterLogs('system')">System</button>
+                    </div>
+                    
+                    <div class="logs-container" id="systemLogs">
+                        <div class="loading">Loading system logs...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add more sections as needed -->
+        </div>
+    </div>
+    
+    <!-- Modals -->
+    <div id="userDetailModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">👤 User Details</h2>
+                <button class="close-modal" onclick="closeUserModal()">×</button>
+            </div>
+            <div class="modal-body" id="userDetailContent">
+                <!-- User details will be loaded here -->
+            </div>
+        </div>
+    </div>
+    
+    <div id="announcementPreviewModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">👁️ Announcement Preview</h2>
+                <button class="close-modal" onclick="closePreviewModal()">×</button>
+            </div>
+            <div class="modal-body" id="announcementPreviewContent">
+                <!-- Preview will be loaded here -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables
+        let currentAdmin = null;
+        let currentSection = 'overview';
+        let users = [];
+        let movies = [];
+        let books = [];
+        let listings = [];
+        let announcements = [];
+        let commands = [];
+        let logs = [];
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        
+        // Initialize admin page
+        window.onload = async function() {
+            await checkAdminAuth();
+            await loadAdminData();
+            setupPage();
+            loadSection('overview');
+        };
+        
+        // Check admin authentication
+        async function checkAdminAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/';
+            }
+        }
+        
+        // Load admin data
+        async function loadAdminData() {
+            const token = localStorage.getItem('token');
+            
+            try {
+                // Load admin profile
+                const profileResponse = await fetch('/api/users/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (profileResponse.ok) {
+                    currentAdmin = await profileResponse.json();
+                    if (!currentAdmin.isAdmin) {
+                        alert('Admin access required!');
+                        window.location.href = '/dashboard';
+                        return;
+                    }
+                }
+                
+                // Load dashboard stats
+                await loadDashboardStats();
+                
+            } catch (error) {
+                console.error('Error loading admin data:', error);
+            }
+        }
+        
+        // Load dashboard stats
+        async function loadDashboardStats() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/admin/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const stats = await response.json();
+                    updateDashboardStats(stats);
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+        
+        // Update dashboard stats
+        function updateDashboardStats(stats) {
+            document.getElementById('totalUsers').textContent = stats.totalUsers || 0;
+            document.getElementById('totalEarnings').textContent = `₦${(stats.totalEarnings || 0).toLocaleString()}`;
+            document.getElementById('totalMovies').textContent = stats.totalMovies || 0;
+            document.getElementById('totalBooks').textContent = stats.totalBooks || 0;
+            document.getElementById('activeListings').textContent = stats.activeListings || 0;
+            document.getElementById('tasksCompleted').textContent = stats.tasksCompleted || 0;
+            
+            // Update badge counts
+            document.getElementById('usersCount').textContent = stats.totalUsers || 0;
+            document.getElementById('pendingVerification').textContent = stats.pendingVerification || 0;
+            document.getElementById('moviesCount').textContent = stats.totalMovies || 0;
+            document.getElementById('booksCount').textContent = stats.totalBooks || 0;
+            document.getElementById('listingsCount').textContent = stats.activeListings || 0;
+            document.getElementById('pendingWithdrawals').textContent = stats.pendingWithdrawals || 0;
+        }
+        
+        // Show section
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.admin-main > div[id$="Section"]').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Remove active class from all menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(`${sectionName}Section`).classList.remove('hidden');
+            
+            // Add active class to clicked menu item
+            event.target.closest('.menu-item').classList.add('active');
+            
+            // Load section data
+            loadSection(sectionName);
+            
+            // Update current section
+            currentSection = sectionName;
+        }
+        
+        // Load section data
+        async function loadSection(sectionName) {
+            switch(sectionName) {
+                case 'users':
+                    await loadUsers();
+                    break;
+                case 'cinema':
+                    await loadMovies();
+                    break;
+                case 'announcements':
+                    await loadAnnouncements();
+                    break;
+                case 'text-commands':
+                    await loadCommands();
+                    break;
+                case 'logs':
+                    await loadLogs();
+                    break;
+                case 'overview':
+                    await loadRecentActivity();
+                    break;
+            }
+        }
+        
+        // Load users
+        async function loadUsers() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/admin/users', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    users = await response.json();
+                    renderUsers();
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+        
+        // Render users
+        function renderUsers(filter = 'all') {
+            const container = document.getElementById('usersTableBody');
+            
+            let filteredUsers = users;
+            if (filter !== 'all') {
+                filteredUsers = users.filter(user => {
+                    if (filter === 'active') return user.isActive;
+                    if (filter === 'inactive') return !user.isActive;
+                    if (filter === 'verified') return user.isVerified;
+                    if (filter === 'unverified') return !user.isVerified;
+                    if (filter === 'recent') {
+                        const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                        return new Date(user.createdAt) > weekAgo;
+                    }
+                    return true;
+                });
+            }
+            
+            // Pagination
+            const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageUsers = filteredUsers.slice(startIndex, endIndex);
+            
+            if (pageUsers.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <div class="empty-icon">👥</div>
+                            <h3 style="color: var(--gold); margin-bottom: 10px;">No Users Found</h3>
+                            <p>No users match your filter criteria.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            container.innerHTML = pageUsers.map(user => `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="user-avatar" style="background: ${stringToColor(user.username)}">
+                                ${user.username?.charAt(0).toUpperCase() || 'U'}
+                            </div>
+                            <div>
+                                <div style="font-weight: bold;">${user.username}</div>
+                                <div style="color: var(--text-gray); font-size: 0.8rem;">ID: ${user._id?.slice(-8)}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${user.email || 'N/A'}</td>
+                    <td style="font-weight: bold; color: var(--green);">₦${(user.balance || 0).toFixed(2)}</td>
+                    <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <span class="status-badge ${user.isActive ? 'status-active' : 'status-inactive'}">
+                            ${user.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                        ${user.isVerified ? '<span class="status-badge status-active" style="margin-left: 5px;">Verified</span>' : ''}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn action-edit" onclick="viewUserDetails('${user._id}')" title="View Details">
+                                👁️
+                            </button>
+                            ${user.isVerified ? 
+                                `<button class="action-btn action-disable" onclick="toggleVerifyUser('${user._id}', false)" title="Unverify">
+                                    ❌
+                                </button>` :
+                                `<button class="action-btn action-verify" onclick="toggleVerifyUser('${user._id}', true)" title="Verify">
+                                    ✅
+                                </button>`
+                            }
+                            ${user.isActive ?
+                                `<button class="action-btn action-disable" onclick="toggleUserStatus('${user._id}', false)" title="Disable">
+                                    ⚠️
+                                </button>` :
+                                `<button class="action-btn action-verify" onclick="toggleUserStatus('${user._id}', true)" title="Enable">
+                                    🔄
+                                </button>`
+                            }
+                            <button class="action-btn action-delete" onclick="deleteUser('${user._id}')" title="Delete">
+                                🗑️
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            renderPagination('usersPagination', totalPages);
+        }
+        
+        // String to color
+        function stringToColor(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
+            return colors[Math.abs(hash) % colors.length];
+        }
+        
+        // Filter users
+        function filterUsers(filter) {
+            // Update active filter button
+            document.querySelectorAll('#usersSection .filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Reset to page 1
+            currentPage = 1;
+            
+            // Render filtered users
+            renderUsers(filter);
+        }
+        
+        // Search users
+        function searchUsers() {
+            const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+            if (!searchTerm) {
+                renderUsers();
+                return;
+            }
+            
+            const filteredUsers = users.filter(user => 
+                user.username.toLowerCase().includes(searchTerm) ||
+                user.email.toLowerCase().includes(searchTerm) ||
+                user._id.toLowerCase().includes(searchTerm)
+            );
+            
+            const container = document.getElementById('usersTableBody');
+            
+            if (filteredUsers.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <div class="empty-icon">🔍</div>
+                            <h3 style="color: var(--gold); margin-bottom: 10px;">No Users Found</h3>
+                            <p>Try a different search term.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filteredUsers.map(user => `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="user-avatar" style="background: ${stringToColor(user.username)}">
+                                ${user.username?.charAt(0).toUpperCase() || 'U'}
+                            </div>
+                            <div>
+                                <div style="font-weight: bold;">${user.username}</div>
+                                <div style="color: var(--text-gray); font-size: 0.8rem;">${user.email}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${user.email}</td>
+                    <td style="font-weight: bold; color: var(--green);">₦${(user.balance || 0).toFixed(2)}</td>
+                    <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <span class="status-badge ${user.isActive ? 'status-active' : 'status-inactive'}">
+                            ${user.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn action-edit" onclick="viewUserDetails('${user._id}')">
+                                👁️
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Refresh users
+        async function refreshUsers() {
+            await loadUsers();
+            alert('Users list refreshed!');
+        }
+        
+        // Export users
+        function exportUsers() {
+            // Create CSV content
+            let csv = 'Username,Email,Balance,Status,Verified,Joined\n';
+            users.forEach(user => {
+                csv += `"${user.username}","${user.email}",${user.balance || 0},${user.isActive ? 'Active' : 'Inactive'},${user.isVerified ? 'Yes' : 'No'},"${new Date(user.createdAt).toLocaleDateString()}"\n`;
+            });
+            
+            // Create download link
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `users_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            alert('Users exported to CSV file!');
+        }
+        
+        // View user details
+        async function viewUserDetails(userId) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const user = await response.json();
+                    showUserModal(user);
+                }
+            } catch (error) {
+                console.error('Error loading user details:', error);
+            }
+        }
+        
+        // Show user modal
+        function showUserModal(user) {
+            const modal = document.getElementById('userDetailModal');
+            const content = document.getElementById('userDetailContent');
+            
+            content.innerHTML = `
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 30px;">
+                    <div>
+                        <div style="text-align: center;">
+                            <div class="user-avatar" style="width: 100px; height: 100px; margin: 0 auto 20px; font-size: 2rem; background: ${stringToColor(user.username)}">
+                                ${user.username?.charAt(0).toUpperCase() || 'U'}
+                            </div>
+                            <h3 style="color: var(--gold); margin-bottom: 5px;">${user.username}</h3>
+                            <div style="color: var(--text-gray);">${user.email}</div>
+                        </div>
+                        
+                        <div style="margin-top: 30px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span style="color: var(--text-gray);">Status:</span>
+                                <span class="status-badge ${user.isActive ? 'status-active' : 'status-inactive'}">
+                                    ${user.isActive ? 'Active' : 'Inactive'}
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span style="color: var(--text-gray);">Verified:</span>
+                                <span class="status-badge ${user.isVerified ? 'status-active' : 'status-inactive'}">
+                                    ${user.isVerified ? 'Yes' : 'No'}
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span style="color: var(--text-gray);">Balance:</span>
+                                <span style="color: var(--green); font-weight: bold;">₦${(user.balance || 0).toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span style="color: var(--text-gray);">Total Earned:</span>
+                                <span style="color: var(--gold);">₦${(user.totalEarned || 0).toFixed(2)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span style="color: var(--text-gray);">Joined:</span>
+                                <span>${new Date(user.createdAt).toLocaleString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 style="color: var(--gold); margin-bottom: 15px;">User Statistics</h4>
+                        <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.8rem; color: var(--gold);">${user.tasksCompleted?.length || 0}</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Tasks Completed</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.8rem; color: var(--gold);">${user.readingHistory?.length || 0}</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Books Read</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.8rem; color: var(--gold);">${user.marketplaceListings?.length || 0}</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Listings</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.8rem; color: var(--gold);">${user.referrals?.length || 0}</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">Referrals</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h4 style="color: var(--gold); margin-bottom: 15px;">Quick Actions</h4>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            ${user.isVerified ? 
+                                `<button class="admin-btn btn-danger" onclick="toggleVerifyUser('${user._id}', false, true)" style="flex: 1;">
+                                    ❌ Unverify Account
+                                </button>` :
+                                `<button class="admin-btn btn-success" onclick="toggleVerifyUser('${user._id}', true, true)" style="flex: 1;">
+                                    ✅ Verify Account
+                                </button>`
+                            }
+                            ${user.isActive ?
+                                `<button class="admin-btn btn-danger" onclick="toggleUserStatus('${user._id}', false, true)" style="flex: 1;">
+                                    ⚠️ Disable Account
+                                </button>` :
+                                `<button class="admin-btn btn-success" onclick="toggleUserStatus('${user._id}', true, true)" style="flex: 1;">
+                                    🔄 Enable Account
+                                </button>`
+                            }
+                            <button class="admin-btn" style="background: var(--wine); color: white; flex: 1;" onclick="addUserBalance('${user._id}')">
+                                💰 Add Balance
+                            </button>
+                            <button class="admin-btn btn-danger" onclick="deleteUser('${user._id}', true)" style="flex: 1;">
+                                🗑️ Delete Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Close user modal
+        function closeUserModal() {
+            document.getElementById('userDetailModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Toggle user verification
+        async function toggleVerifyUser(userId, verify, reload = false) {
+            const action = verify ? 'verify' : 'unverify';
+            const confirmMsg = verify ? 'Verify this user account?' : 'Unverify this user account?';
+            
+            if (!confirm(confirmMsg)) return;
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/admin/users/${userId}/verify`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ verify })
+                });
+                
+                if (response.ok) {
+                    alert(`User ${action}ed successfully!`);
+                    if (reload) {
+                        closeUserModal();
+                    }
+                    await loadUsers();
+                }
+            } catch (error) {
+                console.error('Error toggling verification:', error);
+                alert('Failed to update user verification.');
+            }
+        }
+        
+        // Toggle user status
+        async function toggleUserStatus(userId, activate, reload = false) {
+            const action = activate ? 'activate' : 'deactivate';
+            const confirmMsg = activate ? 'Activate this user account?' : 'Deactivate this user account?';
+            
+            if (!confirm(confirmMsg)) return;
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/admin/users/${userId}/status`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ activate })
+                });
+                
+                if (response.ok) {
+                    alert(`User ${action}d successfully!`);
+                    if (reload) {
+                        closeUserModal();
+                    }
+                    await loadUsers();
+                }
+            } catch (error) {
+                console.error('Error toggling user status:', error);
+                alert('Failed to update user status.');
+            }
+        }
+        
+        // Add user balance
+        async function addUserBalance(userId) {
+            const amount = prompt('Enter amount to add (₦):');
+            if (!amount || isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid amount.');
+                return;
+            }
+            
+            const reason = prompt('Enter reason for adding balance:');
+            if (!reason) {
+                alert('Reason is required.');
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/admin/users/${userId}/balance`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ amount: parseFloat(amount), reason })
+                });
+                
+                if (response.ok) {
+                    alert(`₦${amount} added to user balance!`);
+                    closeUserModal();
+                    await loadUsers();
+                }
+            } catch (error) {
+                console.error('Error adding balance:', error);
+                alert('Failed to add balance.');
+            }
+        }
+        
+        // Delete user
+        async function deleteUser(userId, fromModal = false) {
+            if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    alert('User deleted successfully!');
+                    if (fromModal) {
+                        closeUserModal();
+                    }
+                    await loadUsers();
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                alert('Failed to delete user.');
+            }
+        }
+        
+        // Load movies
+        async function loadMovies() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/admin/movies', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    movies = await response.json();
+                    renderMovies();
+                }
+            } catch (error) {
+                console.error('Error loading movies:', error);
+            }
+        }
+        
+        // Render movies
+        function renderMovies() {
+            const container = document.getElementById('moviesTableBody');
+            
+            if (movies.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <div class="empty-icon">🎬</div>
+                            <h3 style="color: var(--gold); margin-bottom: 10px;">No Movies Found</h3>
+                            <p>Add your first movie to start the cinema!</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            container.innerHTML = movies.map(movie => `
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div style="width: 60px; height: 40px; background: linear-gradient(45deg, var(--black), var(--wine)); border-radius: 5px; display: flex; align-items: center; justify-content: center;">
+                                🎬
+                            </div>
+                            <div>
+                                <div style="font-weight: bold;">${movie.title}</div>
+                                <div style="color: var(--text-gray); font-size: 0.8rem;">${movie.genre}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${movie.genre}</td>
+                    <td>
+                        <div style="font-weight: bold; color: var(--gold);">${movie.votes || 0}</div>
+                        <div style="color: var(--text-gray); font-size: 0.8rem;">votes</div>
+                    </td>
+                    <td>
+                        <span class="status-badge ${movie.isActive ? 'status-active' : 'status-inactive'}">
+                            ${movie.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>${movie.scheduleDate ? new Date(movie.scheduleDate).toLocaleDateString() : 'Not scheduled'}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn action-edit" onclick="editMovie('${movie._id}')" title="Edit">
+                                ✏️
+                            </button>
+                            ${movie.isActive ?
+                                `<button class="action-btn action-disable" onclick="toggleMovieStatus('${movie._id}', false)" title="Deactivate">
+                                    ⚠️
+                                </button>` :
+                                `<button class="action-btn action-verify" onclick="toggleMovieStatus('${movie._id}', true)" title="Activate">
+                                    🔄
+                                </button>`
+                            }
+                            <button class="action-btn action-delete" onclick="deleteMovie('${movie._id}')" title="Delete">
+                                🗑️
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Open add movie form
+        function openAddMovie() {
+            document.getElementById('uploadMovieForm').style.display = 'block';
+            document.getElementById('movieForm').reset();
+            document.getElementById('movieForm').onsubmit = addMovie;
+        }
+        
+        // Close movie form
+        function closeMovieForm() {
+            document.getElementById('uploadMovieForm').style.display = 'none';
+        }
+        
+        // Add movie
+        async function addMovie(event) {
+            event.preventDefault();
+            
+            const movieData = {
+                title: document.getElementById('movieTitle').value,
+                genre: document.getElementById('movieGenre').value,
+                description: document.getElementById('movieDescription').value,
+                duration: document.getElementById('movieDuration').value,
+                director: document.getElementById('movieDirector').value,
+                googleDriveLink: document.getElementById('movieDriveLink').value,
+                thumbnail: document.getElementById('movieThumbnail').value || '',
+                scheduleDate: document.getElementById('movieSchedule').value || null
+            };
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/admin/movies', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(movieData)
+                });
+                
+                if (response.ok) {
+                    alert('Movie added successfully!');
+                    closeMovieForm();
+                    await loadMovies();
+                } else {
+                    const error = await response.json();
+                    alert(error.message || 'Failed to add movie.');
+                }
+            } catch (error) {
+                console.error('Error adding movie:', error);
+                alert('Network error. Please try again.');
+            }
+        }
+        
+        // Toggle cinema status
+        function toggleCinemaStatus() {
+            const current = event.target.textContent.includes('Close') ? 'open' : 'closed';
+            const newStatus = current === 'open' ? 'closed' : 'open';
+            
+            if (confirm(`Are you sure you want to ${newStatus === 'closed' ? 'close' : 'open'} the cinema?`)) {
+                // Update button text
+                event.target.textContent = newStatus === 'closed' ? 'Open Cinema' : 'Close Cinema';
+                
+                // Update status display
+                const statusDiv = event.target.closest('div').querySelector('div > div');
+                statusDiv.innerHTML = `
+                    <div style="font-weight: bold; color: ${newStatus === 'open' ? 'var(--green)' : 'var(--red)'};">Cinema is ${newStatus.toUpperCase()}</div>
+                    <div style="color: var(--text-gray); font-size: 0.9rem;">Users ${newStatus === 'open' ? 'can' : 'cannot'} watch movies</div>
+                `;
+                
+                // Send API request
+                updateCinemaStatus(newStatus);
+            }
+        }
+        
+        // Update cinema status
+        async function updateCinemaStatus(status) {
+            try {
+                const token = localStorage.getItem('token');
+                await fetch('/api/admin/cinema/status', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ status })
+                });
+            } catch (error) {
+                console.error('Error updating cinema status:', error);
+            }
+        }
+        
+        // Load announcements
+        async function loadAnnouncements() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/admin/announcements', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    announcements = await response.json();
+                    renderAnnouncements();
+                }
+            } catch (error) {
+                console.error('Error loading announcements:', error);
+            }
+        }
+        
+        // Render announcements
+        function renderAnnouncements() {
+            const container = document.getElementById('announcementsList');
+            
+            if (announcements.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📢</div>
+                        <h3 style="color: var(--gold); margin-bottom: 10px;">No Announcements</h3>
+                        <p>Create your first announcement!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = announcements.map(ann => `
+                <div class="log-entry ${ann.priority === 'urgent' ? 'log-error' : ann.priority === 'high' ? 'log-warning' : ''}">
+                    <div class="log-time">${new Date(ann.createdAt).toLocaleString()}</div>
+                    <div class="log-message">
+                        <strong>${ann.title}</strong><br>
+                        ${ann.message.substring(0, 200)}${ann.message.length > 200 ? '...' : ''}
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 10px;">
+                        <span style="color: var(--text-gray); font-size: 0.8rem;">To: ${ann.target}</span>
+                        <span style="color: var(--text-gray); font-size: 0.8rem;">Page: ${ann.page}</span>
+                        <span style="color: var(--text-gray); font-size: 0.8rem;">Priority: ${ann.priority}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Show/hide specific users field
+        document.getElementById('announcementTarget').addEventListener('change', function() {
+            const specificGroup = document.getElementById('specificUsersGroup');
+            specificGroup.style.display = this.value === 'specific' ? 'block' : 'none';
+        });
+        
+        // Send announcement
+        async function sendAnnouncement(event) {
+            event.preventDefault();
+            
+            const announcementData = {
+                title: document.getElementById('announcementTitle').value,
+                message: document.getElementById('announcementMessage').value,
+                target: document.getElementById('announcementTarget').value,
+                page: document.getElementById('announcementPage').value,
+                priority: document.getElementById('announcementPriority').value
+            };
+            
+            if (announcementData.target === 'specific') {
+                const userIds = document.getElementById('specificUserIds').value;
+                if (!userIds) {
+                    alert('Please enter specific user IDs.');
+                    return;
+                }
+                announcementData.specificUsers = userIds.split(',').map(id => id.trim());
+            }
+            
+            if (!confirm(`Send announcement to ${announcementData.target} users?`)) {
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/admin/announcements', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(announcementData)
+                });
+                
+                if (response.ok) {
+                    alert('Announcement sent successfully!');
+                    document.getElementById('announcementForm').reset();
+                    await loadAnnouncements();
+                } else {
+                    const error = await response.json();
+                    alert(error.message || 'Failed to send announcement.');
+                }
+            } catch (error) {
+                console.error('Error sending announcement:', error);
+                alert('Network error. Please try again.');
+            }
+        }
+        
+        // Preview announcement
+        function previewAnnouncement() {
+            const title = document.getElementById('announcementTitle').value;
+            const message = document.getElementById('announcementMessage').value;
+            const target = document.getElementById('announcementTarget').value;
+            const page = document.getElementById('announcementPage').value;
+            const priority = document.getElementById('announcementPriority').value;
+            
+            if (!title || !message) {
+                alert('Please fill in title and message first.');
+                return;
+            }
+            
+            const modal = document.getElementById('announcementPreviewModal');
+            const content = document.getElementById('announcementPreviewContent');
+            
+            content.innerHTML = `
+                <div style="background: var(--black); padding: 25px; border-radius: 15px; border: 2px solid ${priority === 'urgent' ? 'var(--red)' : priority === 'high' ? 'var(--yellow)' : 'var(--blue)'};">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="color: ${priority === 'urgent' ? 'var(--red)' : priority === 'high' ? 'var(--yellow)' : 'var(--gold)'};">${title}</h3>
+                        <span style="background: ${priority === 'urgent' ? 'var(--red)' : priority === 'high' ? 'var(--yellow)' : 'var(--blue)'}; color: white; padding: 5px 10px; border-radius: 15px; font-size: 0.8rem;">
+                            ${priority.toUpperCase()}
+                        </span>
+                    </div>
+                    <div style="color: var(--text-light); line-height: 1.6; margin-bottom: 20px;">
+                        ${message.replace(/\n/g, '<br>')}
+                    </div>
+                    <div style="border-top: 1px solid var(--wine); padding-top: 15px; color: var(--text-gray); font-size: 0.9rem;">
+                        <div><strong>Target:</strong> ${target}</div>
+                        <div><strong>Display Page:</strong> ${page}</div>
+                        <div><strong>Sent:</strong> ${new Date().toLocaleString()}</div>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Close preview modal
+        function closePreviewModal() {
+            document.getElementById('announcementPreviewModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Load commands
+        async function loadCommands() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/admin/commands', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    commands = await response.json();
+                    renderCommands();
+                }
+            } catch (error) {
+                console.error('Error loading commands:', error);
+            }
+        }
+        
+        // Render commands
+        function renderCommands() {
+            const container = document.getElementById('commandsTableBody');
+            
+            if (commands.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <div class="empty-icon">⌨️</div>
+                            <h3 style="color: var(--gold); margin-bottom: 10px;">No Commands</h3>
+                            <p>Create your first text command!</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            container.innerHTML = commands.map(cmd => `
+                <tr>
+                    <td>
+                        <div style="font-family: monospace; font-weight: bold;">${cmd.trigger}</div>
+                    </td>
+                    <td>
+                        <div>${cmd.action}</div>
+                        <div style="color: var(--text-gray); font-size: 0.8rem;">${cmd.description || ''}</div>
+                    </td>
+                    <td>
+                        <span class="status-badge ${cmd.access === 'admin' ? 'status-inactive' : 'status-active'}">
+                            ${cmd.access}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge ${cmd.active ? 'status-active' : 'status-inactive'}">
+                            ${cmd.active ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>${new Date(cmd.createdAt).toLocaleDateString()}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn action-edit" onclick="editCommand('${cmd._id}')" title="Edit">
+                                ✏️
+                            </button>
+                            ${cmd.active ?
+                                `<button class="action-btn action-disable" onclick="toggleCommandStatus('${cmd._id}', false)" title="Deactivate">
+                                    ⚠️
+                                </button>` :
+                                `<button class="action-btn action-verify" onclick="toggleCommandStatus('${cmd._id}', true)" title="Activate">
+                                    🔄
+                                </button>`
+                            }
+                            <button class="action-btn action-delete" onclick="deleteCommand('${cmd._id}')" title="Delete">
+                                🗑️
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        // Toggle command fields
+        function toggleCommandFields() {
+            const action = document.getElementById('commandAction').value;
+            
+            // Hide all fields
+            document.getElementById('commandMessageField').style.display = 'none';
+            document.getElementById('commandRewardField').style.display = 'none';
+            document.getElementById('commandUrlField').style.display = 'none';
+            document.getElementById('commandBalanceField').style.display = 'none';
+            document.getElementById('commandCustomField').style.display = 'none';
+            
+            // Show relevant field
+            if (action === 'message') {
+                document.getElementById('commandMessageField').style.display = 'block';
+            } else if (action === 'reward') {
+                document.getElementById('commandRewardField').style.display = 'block';
+            } else if (action === 'redirect') {
+                document.getElementById('commandUrlField').style.display = 'block';
+            } else if (action === 'add_balance') {
+                document.getElementById('commandBalanceField').style.display = 'block';
+            } else if (action === 'custom') {
+                document.getElementById('commandCustomField').style.display = 'block';
+            }
+        }
+        
+        // Create command
+        async function createCommand(event) {
+            event.preventDefault();
+            
+            const commandData = {
+                trigger: document.getElementById('commandTrigger').value,
+                action: document.getElementById('commandAction').value,
+                access: document.getElementById('commandAccess').value,
+                active: document.getElementById('commandActive').checked
+            };
+            
+            // Add action-specific data
+            switch(commandData.action) {
+                case 'message':
+                    commandData.message = document.getElementById('commandMessage').value;
+                    break;
+                case 'reward':
+                    commandData.reward = parseFloat(document.getElementById('commandReward').value);
+                    break;
+                case 'redirect':
+                    commandData.url = document.getElementById('commandUrl').value;
+                    break;
+                case 'add_balance':
+                    commandData.balance = parseFloat(document.getElementById('commandBalance').value);
+                    break;
+                case 'custom':
+                    commandData.customCode = document.getElementById('commandCustom').value;
+                    break;
+            }
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/admin/commands', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(commandData)
+                });
+                
+                if (response.ok) {
+                    alert('Command created successfully!');
+                    document.getElementById('commandForm').reset();
+                    await loadCommands();
+                } else {
+                    const error = await response.json();
+                    alert(error.message || 'Failed to create command.');
+                }
+            } catch (error) {
+                console.error('Error creating command:', error);
+                alert('Network error. Please try again.');
+            }
+        }
+        
+        // Load logs
+        async function loadLogs() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/admin/logs', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    logs = await response.json();
+                    renderLogs();
+                }
+            } catch (error) {
+                console.error('Error loading logs:', error);
+            }
+        }
+        
+        // Render logs
+        function renderLogs(filter = 'all') {
+            const container = document.getElementById('systemLogs');
+            
+            let filteredLogs = logs;
+            if (filter !== 'all') {
+                filteredLogs = logs.filter(log => log.type === filter);
+            }
+            
+            if (filteredLogs.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <h3 style="color: var(--gold); margin-bottom: 10px;">No Logs Found</h3>
+                        <p>No logs match your filter criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = filteredLogs.map(log => `
+                <div class="log-entry ${log.type === 'error' ? 'log-error' : log.type === 'warning' ? 'log-warning' : log.type === 'info' ? 'log-info' : ''}">
+                    <div class="log-time">${new Date(log.timestamp).toLocaleString()}</div>
+                    <div class="log-message">
+                        <strong>${log.module}</strong><br>
+                        ${log.message}
+                    </div>
+                    ${log.userId ? `<div style="color: var(--text-gray); font-size: 0.8rem; margin-top: 5px;">User: ${log.userId}</div>` : ''}
+                </div>
+            `).join('');
+        }
+        
+        // Filter logs
+        function filterLogs(filter) {
+            // Update active filter button
+            document.querySelectorAll('#logsSection .filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Render filtered logs
+            renderLogs(filter);
+        }
+        
+        // Clear logs
+        async function clearLogs() {
+            if (!confirm('Are you sure you want to clear all logs? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/admin/logs', {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    alert('Logs cleared successfully!');
+                    await loadLogs();
+                }
+            } catch (error) {
+                console.error('Error clearing logs:', error);
+                alert('Failed to clear logs.');
+            }
+        }
+        
+        // Export logs
+        function exportLogs() {
+            // Create CSV content
+            let csv = 'Timestamp,Module,Type,Message,User\n';
+            logs.forEach(log => {
+                csv += `"${new Date(log.timestamp).toLocaleString()}","${log.module}","${log.type}","${log.message.replace(/"/g, '""')}","${log.userId || ''}"\n`;
+            });
+            
+            // Create download link
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `logs_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            alert('Logs exported to CSV file!');
+        }
+        
+        // Load recent activity
+        async function loadRecentActivity() {
+            // This would load real activity data from API
+            // For now, we'll use static data
+        }
+        
+        // Render pagination
+        function renderPagination(containerId, totalPages) {
+            const container = document.getElementById(containerId);
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let paginationHTML = '';
+            
+            // Previous button
+            paginationHTML += `
+                <button class="page-btn ${currentPage === 1 ? 'disabled' : ''}" 
+                        onclick="changePage(${currentPage - 1})" 
+                        ${currentPage === 1 ? 'disabled' : ''}>
+                    ❮ Previous
+                </button>
+            `;
+            
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    paginationHTML += `
+                        <button class="page-btn ${i === currentPage ? 'active' : ''}" 
+                                onclick="changePage(${i})">
+                            ${i}
+                        </button>
+                    `;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    paginationHTML += `<span style="color: var(--text-gray); padding: 10px;">...</span>`;
+                }
+            }
+            
+            // Next button
+            paginationHTML += `
+                <button class="page-btn ${currentPage === totalPages ? 'disabled' : ''}" 
+                        onclick="changePage(${currentPage + 1})" 
+                        ${currentPage === totalPages ? 'disabled' : ''}>
+                    Next ❯
+                </button>
+            `;
+            
+            container.innerHTML = paginationHTML;
+        }
+        
+        // Change page
+        function changePage(page) {
+            if (page < 1 || page > Math.ceil(users.length / itemsPerPage)) return;
+            currentPage = page;
+            renderUsers();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Open text command form
+        function openTextCommand() {
+            showSection('text-commands');
+        }
+        
+        // Logout
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/';
+        }
+        
+        // Setup page
+        function setupPage() {
+            // Close modals on escape
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeUserModal();
+                    closePreviewModal();
+                }
+            });
+            
+            // Close modals on outside click
+            document.querySelectorAll('.modal-overlay').forEach(modal => {
+                modal.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                        modal.classList.add('hidden');
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

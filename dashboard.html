@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Scratch C</title>
+    <style>
+        :root {
+            --gold: #FFD700;
+            --black: #000000;
+            --wine: #722F37;
+            --red: #FF0000;
+            --green: #00FF00;
+            --blue: #0000FF;
+            --yellow: #FFFF00;
+            --bg-dark: #121212;
+            --bg-light: #1E1E1E;
+            --text-light: #FFFFFF;
+            --text-gray: #AAAAAA;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: linear-gradient(90deg, var(--black), var(--wine));
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--gold), var(--yellow));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background: var(--wine);
+            color: var(--gold);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .balance-box {
+            background: linear-gradient(45deg, var(--gold), var(--yellow));
+            color: var(--black);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            cursor: pointer;
+            border: 2px solid var(--gold);
+        }
+        
+        .main-content {
+            padding-top: 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 20px 20px;
+        }
+        
+        .welcome-section {
+            background: linear-gradient(135deg, var(--wine), var(--black));
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 1px solid var(--gold);
+        }
+        
+        .welcome-section h1 {
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--bg-light);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid var(--wine);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--gold);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--green);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .action-btn {
+            background: linear-gradient(45deg, var(--blue), var(--green));
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 255, 0, 0.3);
+        }
+        
+        .action-icon {
+            font-size: 2.5rem;
+        }
+        
+        .offerwall-section {
+            background: var(--bg-light);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            border: 1px solid var(--wine);
+        }
+        
+        .section-title {
+            color: var(--gold);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .offerwall-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 500px;
+        }
+        
+        .community-section {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .community-card {
+            flex: 1;
+            min-width: 250px;
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid var(--wine);
+        }
+        
+        .community-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        
+        .join-btn {
+            background: linear-gradient(45deg, var(--green), var(--blue));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .join-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 0, 0.3);
+        }
+        
+        .ads-container {
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid var(--wine);
+            color: var(--text-gray);
+            margin-top: 50px;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .tap-counter {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--wine);
+            color: var(--gold);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            z-index: 1500;
+        }
+        
+        /* Admin Modal Styles */
+        #adminModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .admin-modal-content {
+            background: var(--bg-light);
+            padding: 40px;
+            border-radius: 15px;
+            border: 2px solid var(--red);
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+        }
+        
+        .admin-modal-title {
+            color: var(--red);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+        
+        .admin-warning {
+            color: var(--yellow);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            text-align: center;
+            background: rgba(255, 0, 0, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid var(--red);
+        }
+        
+        .admin-pin-input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: var(--black);
+            color: white;
+            border: 1px solid var(--wine);
+            border-radius: 5px;
+            font-size: 1.2rem;
+            text-align: center;
+            letter-spacing: 3px;
+        }
+        
+        .admin-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .admin-btn {
+            flex: 1;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .admin-btn-access {
+            background: var(--green);
+            color: black;
+        }
+        
+        .admin-btn-cancel {
+            background: var(--red);
+            color: white;
+        }
+        
+        .admin-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .main-content {
+                padding-top: 140px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">Scratch C</div>
+        
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-link active">🏠 Dashboard</a>
+            <a href="/cinema" class="nav-link">🎬 Cinema</a>
+            <a href="/marketplace" class="nav-link">🛍️ Marketplace</a>
+            <a href="/reading" class="nav-link">📚 Reading</a>
+            <a href="/profile" class="nav-link">👤 Profile</a>
+        </div>
+        
+        <div class="user-menu">
+            <div class="balance-box" id="userBalance">
+                <span id="balanceAmount">Loading...</span>
+            </div>
+            <div class="profile-pic" id="profilePic">
+                <span id="profileInitial">U</span>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1 id="welcomeMessage">Welcome back, User!</h1>
+            <p>Check your earnings, watch movies, read books, and connect with community</p>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value" id="totalEarned">₦0.00</div>
+                <div class="stat-label">Total Earnings</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-value" id="tasksCompleted">0</div>
+                <div class="stat-label">Tasks Completed</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+                <div class="stat-value" id="booksRead">0</div>
+                <div class="stat-label">Books Read</div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-value" id="userRank">#---</div>
+                <div class="stat-label">Your Rank</div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <a href="/cinema" class="action-btn">
+                <span class="action-icon">🎬</span>
+                Watch Movies
+            </a>
+            
+            <a href="/reading" class="action-btn">
+                <span class="action-icon">📚</span>
+                Read Books
+            </a>
+            
+            <a href="/marketplace" class="action-btn">
+                <span class="action-icon">🛍️</span>
+                Marketplace
+            </a>
+            
+            <button class="action-btn" onclick="showOfferwall()">
+                <span class="action-icon">💰</span>
+                Earn Money
+            </button>
+        </div>
+        
+        <!-- Offerwall Section -->
+        <div class="offerwall-section">
+            <h2 class="section-title">
+                <span>💸 Earn Money with Offerwall</span>
+                <button onclick="refreshOfferwall()" style="background: var(--gold); color: black; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">
+                    🔄 Refresh Offers
+                </button>
+            </h2>
+            <div class="offerwall-container" id="offerwallContainer">
+                <iframe id="offerwallIframe" src="" style="width:100%; height:500px; border:none;"></iframe>
+            </div>
+        </div>
+        
+        <!-- Community Section -->
+        <div class="community-section">
+            <div class="community-card">
+                <div class="community-icon">📢</div>
+                <h3>Telegram Group</h3>
+                <p>Join our active Telegram community for updates and support</p>
+                <a href="https://t.me/+60VfBwiQ5Z01Yjk0" target="_blank" class="join-btn">Join Telegram</a>
+            </div>
+            
+            <div class="community-card">
+                <div class="community-icon">👥</div>
+                <h3>WhatsApp Community</h3>
+                <p>Connect with other users on WhatsApp</p>
+                <a href="https://chat.whatsapp.com/KGLi5AZqcH1FTxUoTscw2N" target="_blank" class="join-btn">Join WhatsApp</a>
+            </div>
+        </div>
+        
+        <!-- Ads Container -->
+        <div class="ads-container">
+            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1883805796264049" crossorigin="anonymous"></script>
+            <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-1883805796264049"
+                data-ad-slot="3768074715"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2024 Scratch C. Earn, Watch, Read & Connect</p>
+            <p>Need help? Contact: fundrelay18@gmail.com</p>
+        </footer>
+    </div>
+    
+    <!-- Tap Counter (Hidden Admin Access) -->
+    <div class="tap-counter hidden" id="tapCounter">
+        Taps: <span id="tapCount">0</span>/7
+    </div>
+    
+    <!-- Admin Modal - INITIALLY HIDDEN -->
+    <div id="adminModal" class="hidden">
+        <div class="admin-modal-content">
+            <h2 class="admin-modal-title">⚠️ ADMIN ACCESS ⚠️</h2>
+            <div class="admin-warning">
+                WARNING: Don't enter wrong code if you don't have any idea of this room or else you lose your account!
+            </div>
+            <input type="password" id="adminPin" class="admin-pin-input" placeholder="Enter PIN" maxlength="6">
+            <div class="admin-buttons">
+                <button id="adminAccessBtn" class="admin-btn admin-btn-access">Access</button>
+                <button id="adminCancelBtn" class="admin-btn admin-btn-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // User data
+        let userData = null;
+        let tapCount = 0;
+        let tapTimer = null;
+        
+        // Initialize dashboard
+        window.onload = async function() {
+            await checkAuth();
+            await loadUserData();
+            setupOfferwall();
+            setupAdminAccess();
+            setupAdminModal();
+        };
+        
+        // Check authentication
+        async function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/';
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/auth/verify', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/';
+            }
+        }
+        
+        // Load user data
+        async function loadUserData() {
+            const token = localStorage.getItem('token');
+            const storedUser = localStorage.getItem('user');
+            
+            if (storedUser) {
+                userData = JSON.parse(storedUser);
+                updateUserDisplay();
+            }
+            
+            try {
+                const response = await fetch('/api/users/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    userData = await response.json();
+                    localStorage.setItem('user', JSON.stringify(userData));
+                    updateUserDisplay();
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+        
+        // Update user display
+        function updateUserDisplay() {
+            if (!userData) return;
+            
+            document.getElementById('welcomeMessage').textContent = `Welcome back, ${userData.username}!`;
+            document.getElementById('balanceAmount').textContent = `₦${userData.balance.toFixed(2)}`;
+            document.getElementById('totalEarned').textContent = `₦${userData.totalEarned.toFixed(2)}`;
+            document.getElementById('tasksCompleted').textContent = userData.tasksCompleted?.length || 0;
+            document.getElementById('booksRead').textContent = userData.readingHistory?.length || 0;
+            document.getElementById('profileInitial').textContent = userData.username?.charAt(0).toUpperCase() || 'U';
+            
+            // Set profile pic background based on username
+            const colors = ['#0000FF', '#00FF00', '#722F37', '#FFD700', '#FF0000'];
+            const colorIndex = (userData.username?.length || 0) % colors.length;
+            document.getElementById('profilePic').style.background = colors[colorIndex];
+        }
+        
+        // Setup offerwall
+        function setupOfferwall() {
+            const playerId = userData?._id || 'guest';
+            const iframe = document.getElementById('offerwallIframe');
+            iframe.src = `https://api.adgem.com/v1/wall?appid=31739&playerid=${playerId}`;
+        }
+        
+        function showOfferwall() {
+            const container = document.getElementById('offerwallContainer');
+            container.classList.remove('hidden');
+            setupOfferwall();
+        }
+        
+        function refreshOfferwall() {
+            setupOfferwall();
+        }
+        
+        // Admin access setup
+        function setupAdminAccess() {
+            const profilePic = document.getElementById('profilePic');
+            const tapCounter = document.getElementById('tapCounter');
+            
+            // Clear any existing event listeners
+            profilePic.replaceWith(profilePic.cloneNode(true));
+            
+            // Get fresh reference
+            const freshProfilePic = document.getElementById('profilePic');
+            
+            freshProfilePic.addEventListener('click', function(e) {
+                // Prevent navigation to profile
+                e.preventDefault();
+                e.stopPropagation();
+                
+                tapCount++;
+                
+                // Show tap counter
+                tapCounter.classList.remove('hidden');
+                document.getElementById('tapCount').textContent = tapCount;
+                
+                // Reset tap count after 3 seconds
+                clearTimeout(tapTimer);
+                tapTimer = setTimeout(() => {
+                    tapCount = 0;
+                    tapCounter.classList.add('hidden');
+                }, 3000);
+                
+                // If 7 taps, show admin modal
+                if (tapCount >= 7) {
+                    tapCount = 0;
+                    tapCounter.classList.add('hidden');
+                    showAdminModal();
+                }
+            });
+            
+            // Regular profile click (single tap) still goes to profile
+            freshProfilePic.addEventListener('dblclick', function() {
+                window.location.href = '/profile';
+            });
+        }
+        
+        // Setup admin modal buttons
+        function setupAdminModal() {
+            const adminModal = document.getElementById('adminModal');
+            const adminPinInput = document.getElementById('adminPin');
+            const adminAccessBtn = document.getElementById('adminAccessBtn');
+            const adminCancelBtn = document.getElementById('adminCancelBtn');
+            
+            // Access button click
+            adminAccessBtn.addEventListener('click', submitAdminPin);
+            
+            // Cancel button click
+            adminCancelBtn.addEventListener('click', closeAdminModal);
+            
+            // Enter key support
+            adminPinInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    submitAdminPin();
+                }
+            });
+            
+            // Click outside to close
+            adminModal.addEventListener('click', function(e) {
+                if (e.target === adminModal) {
+                    closeAdminModal();
+                }
+            });
+        }
+        
+        function showAdminModal() {
+            const adminModal = document.getElementById('adminModal');
+            const adminPinInput = document.getElementById('adminPin');
+            
+            adminModal.classList.remove('hidden');
+            adminPinInput.value = '';
+            adminPinInput.focus();
+        }
+        
+        function closeAdminModal() {
+            const adminModal = document.getElementById('adminModal');
+            adminModal.classList.add('hidden');
+            tapCount = 0; // Reset tap count
+        }
+        
+        async function submitAdminPin() {
+            const pin = document.getElementById('adminPin').value;
+            const adminModal = document.getElementById('adminModal');
+            
+            if (pin === '141612') {
+                // Correct pin - redirect to admin page
+                window.location.href = '/admin';
+            } else {
+                // Wrong pin - show warning
+                alert('WRONG PIN! Account will be disabled if you continue guessing.');
+                
+                // Close modal
+                adminModal.classList.add('hidden');
+                
+                // Optional: Call API to disable account
+                try {
+                    const token = localStorage.getItem('token');
+                    await fetch('/api/admin/disable-account', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ reason: 'Wrong admin pin attempt' })
+                    });
+                    
+                    // Logout user
+                    localStorage.clear();
+                    window.location.href = '/';
+                } catch (error) {
+                    console.error('Error:', error);
+                    // Still logout even if API call fails
+                    localStorage.clear();
+                    window.location.href = '/';
+                }
+            }
+        }
+        
+        // Logout function (if needed)
+        async function logout() {
+            localStorage.clear();
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>

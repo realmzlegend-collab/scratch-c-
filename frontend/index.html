@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch C - Earn & Connect</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        :root {
+            --primary: #FFD700;
+            --secondary: #FF0000;
+            --accent: #0000FF;
+            --dark: #121212;
+            --light: #FFFFFF;
+            --gray: #2D2D2D;
+            --success: #00FF00;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --gradient: linear-gradient(135deg, #FFD700, #FFA500, #FF0000);
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-particle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary), transparent);
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            25% { transform: translateY(-100px) translateX(100px); opacity: 0.5; }
+            50% { transform: translateY(-200px) translateX(-100px); opacity: 0.3; }
+            75% { transform: translateY(-100px) translateX(-200px); opacity: 0.5; }
+            100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+        }
+
+        /* Container */
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Logo Animation */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .logo-main {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            background: var(--gradient);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: pulse 2s infinite;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .logo-main::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border-radius: 40px;
+            background: var(--gradient);
+            z-index: -1;
+            filter: blur(20px);
+            opacity: 0.5;
+        }
+
+        .logo-text {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--light);
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo-subtext {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        /* Auth Container */
+        .auth-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 40px 30px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: var(--shadow);
+            animation: slideUp 1s ease;
+        }
+
+        /* Auth Tabs */
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 5px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: transparent;
+            color: var(--light);
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .auth-tab.active {
+            background: var(--gradient);
+            color: var(--dark);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Telegram Info Card */
+        .telegram-info {
+            background: rgba(0, 136, 204, 0.1);
+            border: 2px solid #0088cc;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            animation: fadeIn 1s ease;
+        }
+
+        .telegram-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .telegram-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0088cc, #00aced);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .telegram-details {
+            text-align: left;
+            flex: 1;
+        }
+
+        .telegram-name {
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--light);
+        }
+
+        .telegram-username {
+            color: #0088cc;
+            font-size: 14px;
+        }
+
+        .telegram-badge {
+            background: #0088cc;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 25px;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 18px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 215, 0, 0.1);
+            border-radius: 15px;
+            color: var(--light);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary);
+            font-size: 20px;
+        }
+
+        /* User ID Rules */
+        .rules-box {
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            animation: fadeIn 1s ease;
+        }
+
+        .rules-title {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rules-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .rules-list li {
+            padding: 8px 0;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rules-list li i {
+            color: var(--success);
+            font-size: 12px;
+        }
+
+        /* Auth Button */
+        .auth-btn {
+            width: 100%;
+            padding: 20px;
+            background: var(--gradient);
+            border: none;
+            border-radius: 15px;
+            color: var(--dark);
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .auth-btn:active {
+            transform: translateY(-2px);
+        }
+
+        /* Success Animation */
+        .success-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .success-content {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            padding: 50px;
+            border-radius: 30px;
+            text-align: center;
+            border: 2px solid var(--success);
+            max-width: 400px;
+            width: 90%;
+            animation: scaleIn 0.5s ease;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: var(--success);
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: var(--dark);
+            animation: bounce 1s ease;
+        }
+
+        .success-message {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--success);
+            margin-bottom: 20px;
+        }
+
+        .success-details {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 5px solid rgba(255, 215, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin-bottom: 30px;
+        }
+
+        .loading-text {
+            font-size: 18px;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 2px;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .auth-container {
+                padding: 30px 20px;
+            }
+            
+            .logo-main {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .logo-text {
+                font-size: 36px;
+            }
+            
+            .logo-subtext {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="animated-bg" id="animatedBg"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText">Loading...</div>
+    </div>
+
+    <!-- Success Overlay -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-content">
+            <div class="success-icon">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="success-message" id="successMessage">Success!</div>
+            <div class="success-details" id="successDetails"></div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Logo -->
+        <div class="logo-container">
+            <div class="logo-main">
+                <div class="logo-text">SC</div>
+            </div>
+            <div class="logo-subtext">SCRATCH C</div>
+        </div>
+
+        <!-- Auth Container -->
+        <div class="auth-container">
+            <!-- Telegram User Info -->
+            <div class="telegram-info" id="telegramInfo" style="display: none;">
+                <div class="telegram-user">
+                    <div class="telegram-avatar" id="telegramAvatar"></div>
+                    <div class="telegram-details">
+                        <div class="telegram-name" id="telegramName"></div>
+                        <div class="telegram-username" id="telegramUsername"></div>
+                        <div class="telegram-badge">
+                            <i class="fab fa-telegram"></i> Telegram User
+                        </div>
+                    </div>
+                </div>
+                <div id="userStatusMessage"></div>
+            </div>
+
+            <!-- Auth Tabs -->
+            <div class="auth-tabs" id="authTabs" style="display: none;">
+                <button class="auth-tab active" id="signupTab" onclick="switchTab('signup')">
+                    <i class="fas fa-user-plus"></i> Sign Up
+                </button>
+                <button class="auth-tab" id="loginTab" onclick="switchTab('login')">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signupForm" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Preferred Username</label>
+                    <div class="input-with-icon">
+                        <input type="text" class="form-input" id="signupUsername" 
+                               placeholder="Choose your display name" maxlength="20">
+                        <i class="fas fa-user input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Custom User ID</label>
+                    <div class="input-with-icon">
+                        <input type="text" class="form-input" id="customUserId" 
+                               placeholder="e.g., john_doe-123" maxlength="30">
+                        <i class="fas fa-id-card input-icon"></i>
+                    </div>
+                </div>
+
+                <div class="rules-box">
+                    <div class="rules-title">
+                        <i class="fas fa-info-circle"></i> User ID Rules
+                    </div>
+                    <ul class="rules-list">
+                        <li><i class="fas fa-check"></i> Must contain letters AND numbers</li>
+                        <li><i class="fas fa-check"></i> Can include: hyphen (-), underscore (_), period (.)</li>
+                        <li><i class="fas fa-check"></i> No spaces or special characters</li>
+                        <li><i class="fas fa-check"></i> Will be auto-modified if duplicate exists</li>
+                    </ul>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Create Password</label>
+                    <div class="input-with-icon">
+                        <input type="password" class="form-input" id="signupPassword" 
+                               placeholder="Minimum 6 characters">
+                        <i class="fas fa-lock input-icon"></i>
+                    </div>
+                </div>
+
+                <button class="auth-btn" onclick="signup()">
+                    <i class="fas fa-rocket"></i> Create Account
+                </button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="input-with-icon">
+                        <input type="password" class="form-input" id="loginPassword" 
+                               placeholder="Enter your password">
+                        <i class="fas fa-lock input-icon"></i>
+                    </div>
+                </div>
+
+                <button class="auth-btn" onclick="login()">
+                    <i class="fas fa-sign-in-alt"></i> Login to Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Telegram Web App
+        let tg = window.Telegram?.WebApp;
+        let telegramUser = null;
+        let telegramInitData = '';
+        let isExistingUser = false;
+
+        // Create animated background particles
+        function createBackgroundParticles() {
+            const bg = document.getElementById('animatedBg');
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'bg-particle';
+                particle.style.width = Math.random() * 100 + 50 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = Math.random() * 10 + 10 + 's';
+                bg.appendChild(particle);
+            }
+        }
+
+        // Show loading overlay
+        function showLoading(message = 'Loading...') {
+            document.getElementById('loadingText').textContent = message;
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        // Hide loading overlay
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        // Show success overlay
+        function showSuccess(message, details = '', redirectUrl = '/dashboard.html', delay = 2000) {
+            document.getElementById('successMessage').textContent = message;
+            document.getElementById('successDetails').textContent = details;
+            document.getElementById('successOverlay').style.display = 'flex';
+            
+            setTimeout(() => {
+                window.location.href = redirectUrl;
+            }, delay);
+        }
+
+        // Validate Telegram Web App
+        async function initTelegramApp() {
+            showLoading('Connecting to Telegram...');
+
+            if (!tg) {
+                console.warn('Not running in Telegram. Using fallback mode.');
+                showTabs();
+                hideLoading();
+                return;
+            }
+
+            // Expand Telegram Web App
+            tg.expand();
+            tg.enableClosingConfirmation();
+
+            // Get Telegram user data
+            telegramUser = tg.initDataUnsafe?.user;
+            telegramInitData = tg.initData;
+
+            if (!telegramUser) {
+                console.error('No Telegram user data found');
+                showTabs();
+                hideLoading();
+                return;
+            }
+
+            // Display Telegram user info
+            displayTelegramUserInfo();
+
+            // Check if user already exists
+            await checkExistingUser();
+
+            hideLoading();
+        }
+
+        // Display Telegram user information
+        function displayTelegramUserInfo() {
+            const telegramInfo = document.getElementById('telegramInfo');
+            const telegramAvatar = document.getElementById('telegramAvatar');
+            const telegramName = document.getElementById('telegramName');
+            const telegramUsername = document.getElementById('telegramUsername');
+
+            telegramInfo.style.display = 'block';
+
+            // Set avatar
+            if (telegramUser.photo_url) {
+                telegramAvatar.style.backgroundImage = `url('${telegramUser.photo_url}')`;
+                telegramAvatar.style.backgroundSize = 'cover';
+                telegramAvatar.textContent = '';
+            } else {
+                const initials = (telegramUser.first_name?.[0] || 'T') + (telegramUser.last_name?.[0] || 'G');
+                telegramAvatar.textContent = initials;
+                telegramAvatar.style.background = 'linear-gradient(135deg, #0088cc, #00aced)';
+            }
+
+            // Set name
+            let fullName = telegramUser.first_name || '';
+            if (telegramUser.last_name) {
+                fullName += ' ' + telegramUser.last_name;
+            }
+            telegramName.textContent = fullName || 'Telegram User';
+
+            // Set username
+            telegramUsername.textContent = telegramUser.username 
+                ? `@${telegramUser.username}` 
+                : 'No username set';
+        }
+
+        // Check if user already exists
+        async function checkExistingUser() {
+            try {
+                const response = await fetch('/api/auth/telegram/check', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        initData: telegramInitData
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    isExistingUser = data.data.exists;
+                    
+                    if (isExistingUser) {
+                        // User exists - show login form
+                        document.getElementById('userStatusMessage').innerHTML = 
+                            `<div style="text-align: center; color: var(--success); font-weight: bold; margin-top: 10px;">
+                                <i class="fas fa-check-circle"></i> Account found! Please login.
+                            </div>`;
+                        switchTab('login');
+                    } else {
+                        // New user - show signup form
+                        document.getElementById('userStatusMessage').innerHTML = 
+                            `<div style="text-align: center; color: var(--primary); font-weight: bold; margin-top: 10px;">
+                                <i class="fas fa-user-plus"></i> Welcome! Create your account.
+                            </div>`;
+                        switchTab('signup');
+                    }
+                    
+                    showTabs();
+                } else {
+                    throw new Error(data.error || 'Failed to check user');
+                }
+            } catch (error) {
+                console.error('Error checking user:', error);
+                // Fallback to showing both tabs
+                showTabs();
+            }
+        }
+
+        // Show auth tabs
+        function showTabs() {
+            document.getElementById('authTabs').style.display = 'flex';
+            if (isExistingUser) {
+                switchTab('login');
+            } else {
+                switchTab('signup');
+            }
+        }
+
+        // Switch between signup and login tabs
+        function switchTab(tab) {
+            // Update tab buttons
+            document.getElementById('signupTab').classList.toggle('active', tab === 'signup');
+            document.getElementById('loginTab').classList.toggle('active', tab === 'login');
+            
+            // Show/hide forms
+            document.getElementById('signupForm').style.display = tab === 'signup' ? 'block' : 'none';
+            document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+        }
+
+        // Validate custom user ID
+        function validateCustomUserId(userId) {
+            // Basic format validation
+            const userIdRegex = /^[a-zA-Z0-9._-]+$/;
+            if (!userIdRegex.test(userId)) {
+                return {
+                    valid: false,
+                    message: 'User ID can only contain letters, numbers, hyphen, underscore, and period'
+                };
+            }
+
+            // Must contain at least one letter and one number
+            const hasLetter = /[a-zA-Z]/.test(userId);
+            const hasNumber = /[0-9]/.test(userId);
+            
+            if (!hasLetter || !hasNumber) {
+                return {
+                    valid: false,
+                    message: 'User ID must contain both letters AND numbers'
+                };
+            }
+
+            return { valid: true };
+        }
+
+        // Signup function
+        async function signup() {
+            const username = document.getElementById('signupUsername').value.trim();
+            const customUserId = document.getElementById('customUserId').value.trim();
+            const password = document.getElementById('signupPassword').value;
+
+            // Validate inputs
+            if (!username || !customUserId || !password) {
+                alert('❌ Please fill all fields');
+                return;
+            }
+
+            // Validate username
+            if (username.length < 3 || username.length > 20) {
+                alert('❌ Username must be between 3 and 20 characters');
+                return;
+            }
+
+            // Validate custom user ID
+            const userIdValidation = validateCustomUserId(customUserId);
+            if (!userIdValidation.valid) {
+                alert(`❌ ${userIdValidation.message}`);
+                return;
+            }
+
+            // Validate password
+            if (password.length < 6) {
+                alert('❌ Password must be at least 6 characters');
+                return;
+            }
+
+            showLoading('Creating your account...');
+
+            try {
+                const response = await fetch('/api/auth/telegram/signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        initData: telegramInitData,
+                        preferredUsername: username,
+                        customUserId: customUserId,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    hideLoading();
+                    
+                    // Store token and user data
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('user', JSON.stringify(data.data.user));
+                    
+                    // Show success animation
+                    showSuccess(
+                        '🎉 Account Created!',
+                        `Welcome ${username}! You've received ₦100 starting bonus.`,
+                        '/dashboard.html',
+                        2000
+                    );
+                } else {
+                    hideLoading();
+                    alert(`❌ ${data.error || 'Signup failed'}`);
+                }
+            } catch (error) {
+                hideLoading();
+                console.error('Signup error:', error);
+                alert('❌ Network error. Please check your connection.');
+            }
+        }
+
+        // Login function
+        async function login() {
+            const password = document.getElementById('loginPassword').value;
+
+            if (!password) {
+                alert('❌ Please enter your password');
+                return;
+            }
+
+            showLoading('Logging in...');
+
+            try {
+                const response = await fetch('/api/auth/telegram/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        initData: telegramInitData,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    hideLoading();
+                    
+                    // Store token and user data
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('user', JSON.stringify(data.data.user));
+                    
+                    // Show success animation with personalized welcome
+                    showSuccess(
+                        '👋 Welcome Back!',
+                        `Great to see you again, ${data.data.user.username}!`,
+                        '/dashboard.html',
+                        1500
+                    );
+                } else {
+                    hideLoading();
+                    alert(`❌ ${data.error || 'Login failed'}`);
+                }
+            } catch (error) {
+                hideLoading();
+                console.error('Login error:', error);
+                alert('❌ Network error. Please check your connection.');
+            }
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            createBackgroundParticles();
+            initTelegramApp();
+            
+            // Add keyboard support
+            document.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    if (document.getElementById('signupForm').style.display === 'block') {
+                        signup();
+                    } else if (document.getElementById('loginForm').style.display === 'block') {
+                        login();
+                    }
+                }
+            });
+        });
+
+        // Fallback for non-Telegram users (web version)
+        if (!window.Telegram) {
+            window.addEventListener('DOMContentLoaded', function() {
+                // Create mock Telegram data for web testing
+                telegramInitData = 'mock_data_for_web_testing';
+                telegramUser = {
+                    id: Math.floor(Math.random() * 1000000),
+                    first_name: 'Web',
+                    last_name: 'User',
+                    username: 'webuser'
+                };
+                
+                // Show web warning
+                const telegramInfo = document.getElementById('telegramInfo');
+                telegramInfo.innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <div style="color: #FFD700; font-size: 48px; margin-bottom: 10px;">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <div style="color: white; font-weight: bold; font-size: 18px; margin-bottom: 10px;">
+                            Web Version Active
+                        </div>
+                        <div style="color: rgba(255,255,255,0.7); font-size: 14px;">
+                            For full Telegram Mini App features, please open in Telegram
+                        </div>
+                    </div>
+                `;
+                telegramInfo.style.display = 'block';
+                
+                // Show auth tabs
+                showTabs();
+            });
+        }
+    </script>
+</body>
+  </html>

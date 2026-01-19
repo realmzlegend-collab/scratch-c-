@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Scratch C</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7111358981076444" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        :root {
+            --primary: #FFD700; --secondary: #FF0000; --accent: #0000FF;
+            --dark: #121212; --light: #FFFFFF; --gray: #2D2D2D; --success: #00FF00;
+            --card-bg: rgba(255, 255, 255, 0.05);
+        }
+        body { background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%); color: var(--light); min-height: 100vh; padding-bottom: 80px; }
+        
+        .app-header { background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px); padding: 15px 20px; position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(255, 215, 0, 0.2); }
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        
+        /* PROFILE SECTION */
+        .profile-header { padding: 30px 20px; display: flex; flex-direction: column; align-items: center; text-align: center; background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 0, 0, 0.05)); margin: 20px; border-radius: 20px; position: relative; overflow: hidden; }
+        .profile-pic-container { position: relative; width: 150px; height: 150px; margin-bottom: 20px; }
+        .profile-pic { 
+            width: 100%; height: 100%; border-radius: 50%; 
+            border: 4px solid var(--primary); /* INITIAL YELLOW BORDER */
+            background: var(--gray); display: flex; align-items: center; justify-content: center; 
+            font-size: 60px; color: var(--primary); cursor: pointer; 
+            transition: all 0.3s ease; user-select: none;
+        }
+        .profile-pic.access-granted { border-color: var(--success); } /* GREEN BORDER */
+
+        /* STATS GRID */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin: 0 20px 30px; }
+        .stat-card { background: var(--card-bg); padding: 20px; border-radius: 15px; text-align: center; border-left: 4px solid var(--primary); backdrop-filter: blur(10px); }
+        .stat-value { font-size: 28px; font-weight: bold; color: var(--primary); margin-bottom: 5px; }
+        .stat-label { color: #888; font-size: 14px; }
+
+        /* MODALS */
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { background: var(--dark); padding: 30px; border-radius: 20px; border: 2px solid var(--primary); width: 90%; max-width: 350px; text-align: center; }
+        .secret-input { width: 100%; padding: 12px; margin: 15px 0; background: #222; border: 1px solid var(--primary); color: white; border-radius: 8px; text-align: center; }
+
+        /* NAV BAR */
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: space-around; padding: 15px; border-top: 1px solid rgba(255,215,0,0.2); }
+        .nav-item { color: #888; text-decoration: none; font-size: 12px; text-align: center; }
+        .nav-item.active { color: var(--primary); }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-content">
+            <h2 style="color: var(--primary)">Profile</h2>
+            <a href="dashboard.html" style="color: white; text-decoration: none;"><i class="fas fa-arrow-left"></i></a>
+        </div>
+    </header>
+
+    <div class="profile-header">
+        <div class="profile-pic-container">
+            <div class="profile-pic" id="profileTrigger">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+        <h2 id="userName" style="color: var(--primary)">Loading...</h2>
+        <p id="userEmail" style="color: #888">---</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" id="valBalance">₦0.00</div>
+            <div class="stat-label">Balance</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="valEarned" style="color: var(--success)">₦0.00</div>
+            <div class="stat-label">Total Earned</div>
+        </div>
+    </div>
+
+    <div style="padding: 0 20px;">
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7111358981076444" data-ad-slot="YOUR_SLOT_ID" data-ad-format="auto"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
+    <div id="pinModal" class="modal">
+        <div class="modal-content">
+            <h3 style="color: var(--primary)">Enter Security PIN</h3>
+            <input type="password" id="pinInput" class="secret-input" placeholder="******">
+            <button onclick="verifyPin()" style="background:var(--primary); padding:10px 20px; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">Verify</button>
+        </div>
+    </div>
+
+    <div id="cmdModal" class="modal">
+        <div class="modal-content">
+            <h3 style="color: var(--primary)">System Command</h3>
+            <input type="text" id="cmdInput" class="secret-input" placeholder="Type command here">
+            <button onclick="verifyCommand()" style="background:var(--success); padding:10px 20px; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">Execute</button>
+        </div>
+    </div>
+
+    <nav class="nav-bar">
+        <a href="dashboard.html" class="nav-item"><i class="fas fa-home fa-lg"></i><div>Home</div></a>
+        <a href="reading.html" class="nav-item"><i class="fas fa-book fa-lg"></i><div>Read</div></a>
+        <a href="profile.html" class="nav-item active"><i class="fas fa-user fa-lg"></i><div>Profile</div></a>
+    </nav>
+
+    <script>
+        // 1. DATA LOADING
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if(user) {
+                document.getElementById('userName').innerText = user.username;
+                document.getElementById('userEmail').innerText = user.email || 'Verified User';
+                document.getElementById('valBalance').innerText = '₦' + (user.balance || 0).toLocaleString();
+                document.getElementById('valEarned').innerText = '₦' + (user.totalEarned || 0).toLocaleString();
+            }
+        });
+
+        // 2. SECRET ACCESS LOGIC
+        const trigger = document.getElementById('profileTrigger');
+        let tapCount = 0;
+        let lastTapTime = 0;
+
+        trigger.addEventListener('click', () => {
+            const currentTime = new Date().getTime();
+            if (currentTime - lastTapTime < 400) {
+                tapCount++;
+            } else {
+                tapCount = 1;
+            }
+            lastTapTime = currentTime;
+
+            // Trigger after 7 taps
+            if (tapCount === 7) {
+                tapCount = 0;
+                // Visual Feedback: Change border to Green
+                trigger.classList.add('access-granted');
+                
+                // Wait 5 seconds, then show PIN modal
+                setTimeout(() => {
+                    trigger.classList.remove('access-granted'); // Reset border
+                    document.getElementById('pinModal').style.display = 'flex';
+                }, 5000);
+            }
+        });
+
+        function verifyPin() {
+            const pin = document.getElementById('pinInput').value;
+            if(pin === "141612") {
+                document.getElementById('pinModal').style.display = 'none';
+                document.getElementById('cmdModal').style.display = 'flex';
+            } else { location.reload(); }
+        }
+
+        function verifyCommand() {
+            const cmd = document.getElementById('cmdInput').value;
+            if(cmd === "MENU BOUNCER 0 REALLY 1") {
+                alert("🤝 Handshake Success");
+                window.location.href = 'admin.html';
+            } else { location.reload(); }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cinema - Scratch C</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7111358981076444" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary: #FFD700; --dark: #121212; --light: #FFFFFF; }
+        body { background: #0a0a0a; color: var(--light); font-family: sans-serif; margin: 0; }
+        .container { max-width: 500px; margin: 0 auto; padding: 20px; }
+        .logo-small { width: 40px; height: 40px; background-image: url('logo.svg'); background-size: cover; border-radius: 8px; }
+        .video-card { background: #1a1a1a; border-radius: 20px; overflow: hidden; margin-bottom: 25px; border: 1px solid #333; }
+        .video-thumb { width: 100%; height: 200px; background: #000; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <div class="logo-small"></div>
+            <h3>Scratch Cinema</h3>
+            <div id="balance" style="color: var(--primary); font-weight: bold;">₦0.00</div>
+        </div>
+
+        <div class="video-card">
+            <div class="video-thumb"><i class="fas fa-play"></i></div>
+            <div style="padding: 15px;">
+                <h4>Watch & Earn Video #1</h4>
+                <p style="font-size: 13px; opacity: 0.7;">Reward: ₦5.00</p>
+                <button onclick="watchVideo()" style="width:100%; padding:12px; background:var(--primary); border:none; border-radius:10px; margin-top:10px; font-weight:bold;">Watch Now</button>
+            </div>
+        </div>
+
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7111358981076444" data-ad-slot="YOUR_SLOT_ID" data-ad-format="auto"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
+    <script>
+        async function loadProfile() {
+            const token = localStorage.getItem('token');
+            const res = await fetch('/api/auth/profile', { headers: { 'Authorization': 'Bearer ' + token }});
+            const data = await res.json();
+            if (data.success) document.getElementById('balance').textContent = '₦' + data.user.balance.toFixed(2);
+        }
+        loadProfile();
+    </script>
+</body>
+</html>

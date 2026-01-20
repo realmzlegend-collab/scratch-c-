@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch C - Earn & Connect</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* [All previous CSS remains exactly the same] */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        :root {
+            --primary: #FFD700;
+            --secondary: #FF0000;
+            --accent: #0000FF;
+            --dark: #121212;
+            --light: #FFFFFF;
+            --gray: #2D2D2D;
+            --success: #00FF00;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --gradient: linear-gradient(135deg, #FFD700, #FFA500, #FF0000);
+        }
+        /* ... [All other CSS remains the same] ... */
+    </style>
+</head>
+<body>
+    <div class="animated-bg" id="animatedBg"></div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText">Loading...</div>
+    </div>
+
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-content">
+            <div class="success-icon"><i class="fas fa-check"></i></div>
+            <div class="success-message" id="successMessage">Success!</div>
+            <div class="success-details" id="successDetails"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="logo-container">
+            <div class="logo-main">
+                <!-- Logo will be loaded from frontend/assets/logo.svg -->
+            </div>
+            <div class="logo-subtext">SCRATCH C</div>
+        </div>
+        
+        <!-- Banner Section -->
+        <div class="banner-section">
+            <div class="banner-content">
+                <div class="banner-text">
+                    <h2>🎬 Welcome to Scratch C!</h2>
+                    <p>Your ultimate platform for reading, cinema, marketplace, and earning credits!</p>
+                </div>
+                <div class="banner-image">
+                    <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Cinema Room">
+                </div>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-book"></i></div>
+                        <div class="feature-text">Read & Earn Credits</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-film"></i></div>
+                        <div class="feature-text">Watch Movies</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-store"></i></div>
+                        <div class="feature-text">Buy & Sell</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon"><i class="fas fa-comments"></i></div>
+                        <div class="feature-text">Community Chat</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-container">
+            <div class="welcome-message">
+                <div class="welcome-title">Join Scratch C Today!</div>
+                <div class="welcome-text">Login to access your dashboard and start earning rewards</div>
+            </div>
+
+            <div id="manualLogin">
+                <div class="form-group">
+                    <input type="text" class="form-input" id="username" placeholder="Username" value="demo">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-input" id="password" placeholder="Password" value="demo123">
+                </div>
+                
+                <button class="auth-btn" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <button class="auth-btn" id="signupBtn" style="background: var(--accent); margin-top: 10px;">
+                    <i class="fas fa-user-plus"></i> New Account? Signup
+                </button>
+            </div>
+
+            <div id="errorContainer" style="display: none;"></div>
+            
+            <!-- Quick Test Buttons -->
+            <div style="margin-top: 20px; text-align: center;">
+                <button onclick="testBackendConnection()" style="padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 5px; margin: 5px; font-size: 12px;">
+                    Test Backend
+                </button>
+                <button onclick="testLogin()" style="padding: 8px 15px; background: #28a745; color: white; border: none; border-radius: 5px; margin: 5px; font-size: 12px;">
+                    Test Login API
+                </button>
+                <button onclick="clearStorage()" style="padding: 8px 15px; background: #dc3545; color: white; border: none; border-radius: 5px; margin: 5px; font-size: 12px;">
+                    Clear Storage
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // FIXED BACKEND CONNECTION SCRIPT
+        
+        console.log('✅ Scratch C Frontend - Fixed Backend Connection');
+
+        // Backend Configuration - MUST MATCH YOUR BACKEND
+        const BACKEND_CONFIG = {
+            // If running locally with separate ports
+            baseUrl: 'http://localhost:3000', // Your backend port
+            // baseUrl: 'http://localhost:5500', // If using same port
+            
+            // API Endpoints from your backend
+            endpoints: {
+                test: '/api/test',
+                login: '/api/auth/login',
+                signup: '/api/auth/signup',
+                profile: '/api/auth/profile'
+            },
+            
+            // JWT Settings (from your auth.js)
+            jwtCookieName: 'token', // Your backend uses cookies
+            localStorageTokenKey: 'token', // We'll store in localStorage too
+            localStorageUserKey: 'user'
+        };
+
+        // Build full URLs
+        const getApiUrl = (endpoint) => {
+            return BACKEND_CONFIG.baseUrl + BACKEND_CONFIG.endpoints[endpoint];
+        };
+
+        // Background Animation
+        function createBackgroundParticles() {
+            const bg = document.getElementById('animatedBg');
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'bg-particle';
+                const size = Math.random() * 80 + 40;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.opacity = 0.2 + Math.random() * 0.3;
+                bg.appendChild(particle);
+            }
+        }
+
+        // UI Helpers
+        function showLoading(msg) {
+            document.getElementById('loadingText').textContent = msg;
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() { 
+            document.getElementById('loadingOverlay').style.display = 'none'; 
+        }
+
+        function showError(msg, details = '') {
+            const errDiv = document.getElementById('errorContainer');
+            errDiv.innerHTML = `
+                <div class="error-message">
+                    <strong>❌ ${msg}</strong>
+                    ${details ? `<div style="margin-top: 5px; font-size: 12px;">${details}</div>` : ''}
+                </div>
+            `;
+            errDiv.style.display = 'block';
+            setTimeout(() => { errDiv.style.display = 'none'; }, 5000);
+        }
+
+        function showSuccess(msg, details) {
+            document.getElementById('successMessage').textContent = msg;
+            document.getElementById('successDetails').textContent = details;
+            document.getElementById('successOverlay').style.display = 'flex';
+            setTimeout(() => { 
+                window.location.href = 'dashboard.html'; 
+            }, 1500);
+        }
+
+        // Enhanced fetch with better error handling
+        async function apiFetch(endpoint, options = {}) {
+            const url = getApiUrl(endpoint);
+            
+            // Default headers
+            const defaultHeaders = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            };
+            
+            // Add authorization token if exists
+            const token = localStorage.getItem(BACKEND_CONFIG.localStorageTokenKey);
+            if (token) {
+                defaultHeaders['Authorization'] = `Bearer ${token}`;
+            }
+            
+            const config = {
+                ...options,
+                headers: {
+                    ...defaultHeaders,
+                    ...options.headers
+                },
+                credentials: 'include' // IMPORTANT: For cookies/sessions
+            };
+            
+            console.log(`🌐 API Call: ${endpoint}`, { url, config });
+            
+            try {
+                const response = await fetch(url, config);
+                
+                // Log response for debugging
+                console.log(`📥 Response [${endpoint}]:`, {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: Object.fromEntries(response.headers.entries())
+                });
+                
+                // Try to parse response
+                let data;
+                const contentType = response.headers.get('content-type');
+                
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    console.warn('⚠️ Non-JSON response:', text);
+                    try {
+                        data = JSON.parse(text);
+                    } catch {
+                        data = { 
+                            success: false, 
+                            error: 'Server returned non-JSON response',
+                            raw: text.substring(0, 100) 
+                        };
+                    }
+                }
+                
+                return {
+                    ok: response.ok,
+                    status: response.status,
+                    data: data,
+                    headers: response.headers
+                };
+                
+            } catch (error) {
+                console.error(`❌ Fetch error [${endpoint}]:`, error);
+                return {
+                    ok: false,
+                    status: 0,
+                    data: { 
+                        success: false, 
+                        error: `Network error: ${error.message}` 
+                    },
+                    error: error
+                };
+            }
+        }
+
+        // Test backend connection
+        async function testBackendConnection() {
+            showLoading('Testing backend connection...');
+            
+            const result = await apiFetch('test');
+            
+            hideLoading();
+            
+            if (result.ok) {
+                alert(`✅ Backend is working!\n\nResponse: ${JSON.stringify(result.data, null, 2)}`);
+                console.log('✅ Backend test passed:', result.data);
+                return true;
+            } else {
+                const errorMsg = result.data?.error || `HTTP ${result.status}`;
+                alert(`❌ Backend test failed:\n\n${errorMsg}\n\nCheck:\n1. Is backend running on ${BACKEND_CONFIG.baseUrl}?\n2. Check CORS settings\n3. Check server logs`);
+                console.error('❌ Backend test failed:', result);
+                return false;
+            }
+        }
+
+        // Test login API directly
+        async function testLogin() {
+            const testData = {
+                username: 'test',
+                password: 'test123'
+            };
+            
+            showLoading('Testing login API...');
+            
+            try {
+                const response = await fetch(getApiUrl('login'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData),
+                    credentials: 'include'
+                });
+                
+                const data = await response.json().catch(() => ({}));
+                
+                hideLoading();
+                
+                alert(`Login Test Result:\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`);
+                
+            } catch (error) {
+                hideLoading();
+                alert(`❌ Login test error: ${error.message}`);
+            }
+        }
+
+        // Handle login
+        async function handleLogin() {
+            const username = document.getElementById('username')?.value.trim();
+            const password = document.getElementById('password')?.value;
+            
+            if (!username || !password) {
+                showError('Please enter username and password');
+                return;
+            }
+            
+            console.log('🔄 Login attempt for:', username);
+            showLoading('Logging in...');
+            
+            const loginData = { username, password };
+            
+            try {
+                // Call login endpoint
+                const result = await apiFetch('login', {
+                    method: 'POST',
+                    body: JSON.stringify(loginData)
+                });
+                
+                if (result.ok && result.data.success) {
+                    console.log('✅ Login successful:', result.data);
+                    
+                    // Extract token from response (check both cookie and response body)
+                    const token = result.data.token || 
+                                 result.headers.get('Authorization')?.replace('Bearer ', '');
+                    
+                    if (token) {
+                        localStorage.setItem(BACKEND_CONFIG.localStorageTokenKey, token);
+                    }
+                    
+                    // Store user data
+                    if (result.data.user) {
+                        localStorage.setItem(BACKEND_CONFIG.localStorageUserKey, JSON.stringify(result.data.user));
+                    }
+                    
+                    // Also store in sessionStorage for backup
+                    sessionStorage.setItem('auth_token', token || '');
+                    sessionStorage.setItem('user', JSON.stringify(result.data.user || {}));
+                    
+                    hideLoading();
+                    showSuccess(
+                        'Welcome Back!',
+                        `Logged in as ${result.data.user?.username || username}`
+                    );
+                    
+                } else {
+                    hideLoading();
+                    
+                    const errorMsg = result.data?.error || 
+                                   result.data?.message || 
+                                   `Login failed (Status: ${result.status})`;
+                    
+                    showError('Login Failed', errorMsg);
+                    
+                    // Try to extract more details
+                    if (result.data?.errors) {
+                        console.error('Validation errors:', result.data.errors);
+                    }
+                }
+                
+            } catch (error) {
+                hideLoading();
+                console.error('❌ Login process error:', error);
+                showError('Login Error', error.message);
+            }
+        }
+
+        // Handle signup
+        async function handleSignup() {
+            const username = document.getElementById('username')?.value.trim();
+            const password = document.getElementById('password')?.value;
+            
+            if (!username || !password) {
+                showError('Please enter username and password');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters');
+                return;
+            }
+            
+            console.log('🔄 Signup attempt for:', username);
+            showLoading('Creating account...');
+            
+            const signupData = { username, password };
+            
+            try {
+                const result = await apiFetch('signup', {
+                    method: 'POST',
+                    body: JSON.stringify(signupData)
+                });
+                
+                if (result.ok && result.data.success) {
+                    console.log('✅ Signup successful:', result.data);
+                    
+                    // Store token and user data
+                    const token = result.data.token;
+                    if (token) {
+                        localStorage.setItem(BACKEND_CONFIG.localStorageTokenKey, token);
+                    }
+                    
+                    if (result.data.user) {
+                        localStorage.setItem(BACKEND_CONFIG.localStorageUserKey, JSON.stringify(result.data.user));
+                    }
+                    
+                    hideLoading();
+                    showSuccess(
+                        'Account Created!',
+                        `Welcome to Scratch C, ${result.data.user?.username || username}!`
+                    );
+                    
+                } else {
+                    hideLoading();
+                    
+                    const errorMsg = result.data?.error || 
+                                   result.data?.message || 
+                                   `Signup failed (Status: ${result.status})`;
+                    
+                    showError('Signup Failed', errorMsg);
+                    
+                    // Handle specific errors
+                    if (result.status === 400) {
+                        showError('Invalid Data', 'Please check your input');
+                    } else if (result.status === 409) {
+                        showError('Username Taken', 'This username already exists');
+                    }
+                }
+                
+            } catch (error) {
+                hideLoading();
+                console.error('❌ Signup process error:', error);
+                showError('Signup Error', error.message);
+            }
+        }
+
+        // Check current backend status
+        async function checkBackendStatus() {
+            console.log('🔍 Checking backend status...');
+            
+            try {
+                // Try multiple endpoints
+                const endpoints = [
+                    BACKEND_CONFIG.baseUrl + '/api/test',
+                    BACKEND_CONFIG.baseUrl + '/',
+                    BACKEND_CONFIG.baseUrl + '/api'
+                ];
+                
+                for (const endpoint of endpoints) {
+                    try {
+                        const response = await fetch(endpoint, {
+                            method: 'GET',
+                            headers: { 'Accept': 'application/json' },
+                            credentials: 'include'
+                        });
+                        
+                        if (response.ok) {
+                            console.log(`✅ Backend reachable at: ${endpoint}`);
+                            return true;
+                        }
+                    } catch (e) {
+                        // Continue trying next endpoint
+                    }
+                }
+                
+                console.warn('⚠️ Backend not reachable at any endpoint');
+                return false;
+                
+            } catch (error) {
+                console.error('❌ Backend check error:', error);
+                return false;
+            }
+        }
+
+        // Clear storage
+        function clearStorage() {
+            localStorage.clear();
+            sessionStorage.clear();
+            alert('Storage cleared! Page will reload.');
+            location.reload();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Initializing Scratch C Frontend...');
+            
+            // Create background
+            createBackgroundParticles();
+            
+            // Setup button events
+            document.getElementById('loginBtn').addEventListener('click', handleLogin);
+            document.getElementById('signupBtn').addEventListener('click', handleSignup);
+            
+            // Auto-check backend status
+            setTimeout(async () => {
+                const isBackendUp = await checkBackendStatus();
+                
+                if (!isBackendUp) {
+                    const warning = document.createElement('div');
+                    warning.innerHTML = `
+                        <div style="
+                            position: fixed;
+                            top: 10px;
+                            right: 10px;
+                            background: rgba(255,100,0,0.9);
+                            color: white;
+                            padding: 15px;
+                            border-radius: 8px;
+                            z-index: 9999;
+                            border: 2px solid #ff6600;
+                            max-width: 300px;
+                            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                            font-size: 14px;
+                        ">
+                            <strong>⚠️ Backend Connection Issue</strong><br>
+                            <span style="font-size: 12px;">
+                                Cannot connect to backend at:<br>
+                                <code>${BACKEND_CONFIG.baseUrl}</code><br><br>
+                                Please make sure:<br>
+                                1. Backend is running<br>
+                                2. Port ${BACKEND_CONFIG.baseUrl.split(':')[2] || '3000'} is accessible
+                            </span>
+                            <button onclick="this.parentElement.remove()" style="
+                                position: absolute;
+                                top: 5px;
+                                right: 5px;
+                                background: transparent;
+                                border: none;
+                                color: white;
+                                cursor: pointer;
+                                font-size: 18px;
+                            ">×</button>
+                        </div>
+                    `;
+                    document.body.appendChild(warning);
+                }
+            }, 2000);
+            
+            // Handle Enter key
+            document.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const username = document.getElementById('username')?.value;
+                    const password = document.getElementById('password')?.value;
+                    
+                    if (username && password) {
+                        handleLogin();
+                    }
+                }
+            });
+            
+            // Auto-focus username field
+            setTimeout(() => {
+                document.getElementById('username').focus();
+            }, 500);
+            
+            // Log helpful info
+            console.log(`
+                🔧 Scratch C Configuration:
+                ---------------------------
+                Backend URL: ${BACKEND_CONFIG.baseUrl}
+                Login Endpoint: ${getApiUrl('login')}
+                Signup Endpoint: ${getApiUrl('signup')}
+                
+                💡 Troubleshooting Tips:
+                1. Run backend: npm start (in backend folder)
+                2. Check if MongoDB is running
+                3. Test backend directly: ${BACKEND_CONFIG.baseUrl}/api/test
+                4. Check browser console (F12) for errors
+                5. Try different backend port if 3000 is busy
+            `);
+        });
+
+        // Global helper functions
+        window.testBackend = testBackendConnection;
+        window.testLoginAPI = testLogin;
+        window.clearStorage = clearStorage;
+    </script>
+</body>
+  </html>

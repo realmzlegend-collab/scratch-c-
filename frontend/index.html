@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch C - Earn & Connect</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== MODERN DARK THEME ===== */
+        :root {
+            --primary: #FFD700;
+            --secondary: #FF4081;
+            --accent: #2196F3;
+            --dark: #0F0F23;
+            --darker: #090914;
+            --light: #FFFFFF;
+            --gray: #1E1E2E;
+            --success: #4CAF50;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --gradient: linear-gradient(135deg, #FFD700, #FF6B00, #FF4081);
+            --gradient-blue: linear-gradient(135deg, #2196F3, #21CBF3);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --glow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ===== ANIMATED BACKGROUND ===== */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle linear infinite;
+        }
+
+        .glow-effect {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: -1;
+            animation: floatGlow 20s ease-in-out infinite;
+        }
+
+        .glow-1 {
+            top: -200px;
+            right: -200px;
+            background: radial-gradient(circle, rgba(255, 64, 129, 0.1) 0%, transparent 70%);
+        }
+
+        .glow-2 {
+            bottom: -200px;
+            left: -200px;
+            background: radial-gradient(circle, rgba(33, 150, 243, 0.1) 0%, transparent 70%);
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== LOGO SECTION ===== */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .logo-main {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 20px;
+            background: var(--gradient);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: var(--shadow), var(--glow);
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .logo-main:hover {
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4);
+        }
+
+        .logo-main::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: var(--gradient);
+            border-radius: 32px;
+            z-index: -1;
+            filter: blur(10px);
+            opacity: 0.6;
+        }
+
+        .logo-main::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            border-radius: 30px;
+        }
+
+        .logo-image {
+            width: 70%;
+            height: 70%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .logo-text {
+            font-size: 52px;
+            font-weight: 900;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .logo-subtext {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .logo-tagline {
+            font-size: 14px;
+            color: var(--primary);
+            margin-top: 5px;
+            font-weight: 600;
+        }
+
+        /* ===== BANNER SECTION ===== */
+        .banner-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.8s ease;
+        }
+
+        .banner-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient);
+        }
+
+        .banner-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .banner-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--dark);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .banner-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            flex: 1;
+        }
+
+        .banner-image {
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            position: relative;
+            max-height: 220px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .banner-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .banner-image:hover img {
+            transform: scale(1.05);
+        }
+
+        .banner-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.5));
+        }
+
+        .banner-description {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+            background: rgba(255, 215, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.2);
+        }
+
+        .feature-card i {
+            font-size: 22px;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .feature-card span {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--light);
+        }
+
+        /* ===== AUTH CONTAINER ===== */
+        .auth-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 30px;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 1s ease;
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-blue);
+        }
+
+        .welcome-message {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: rgba(33, 150, 243, 0.1);
+            border-radius: 15px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .welcome-title {
+            font-size: 22px;
+            color: var(--accent);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .welcome-text {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: var(--light);
+            font-size: 16px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 16px;
+            top: 42px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* ===== BUTTONS ===== */
+        .auth-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--gradient);
+            border: none;
+            border-radius: 15px;
+            color: var(--dark);
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px;
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(255, 215, 0, 0.4);
+        }
+
+        .auth-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .auth-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .auth-btn:hover::after {
+            left: 100%;
+        }
+
+        .btn-secondary {
+            background: var(--gradient-blue);
+            box-shadow: 0 8px 20px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 12px 25px rgba(33, 150, 243, 0.4);
+        }
+
+        /* ===== ERROR/SUCCESS MESSAGES ===== */
+        .error-message {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 14px;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            display: none;
+        }
+
+        .success-message {
+            color: var(--success);
+            background: rgba(76, 175, 80, 0.1);
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 14px;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            display: none;
+        }
+
+        /* ===== LOADING STATES ===== */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 15, 35, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 5px solid rgba(255, 215, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin-bottom: 25px;
+        }
+
+        .loading-text {
+            font-size: 18px;
+            color: var(--primary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        /* ===== DEBUG PANEL ===== */
+        .debug-panel {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            display: none;
+        }
+
+        .debug-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .debug-title {
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .debug-content {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Courier New', monospace;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .logo-main {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .logo-text {
+                font-size: 42px;
+            }
+            
+            .banner-section, .auth-container {
+                padding: 20px;
+            }
+            
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .feature-card {
+                padding: 12px;
+            }
+            
+            .auth-btn {
+                padding: 16px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-main {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .logo-text {
+                font-size: 36px;
+            }
+            
+            .logo-subtext {
+                font-size: 14px;
+            }
+            
+            .banner-title {
+                font-size: 20px;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes floatGlow {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(50px, 50px) rotate(120deg); }
+            66% { transform: translate(-50px, -50px) rotate(240deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="stars" id="stars"></div>
+    <div class="glow-effect glow-1"></div>
+    <div class="glow-effect glow-2"></div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText">Initializing...</div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Logo -->
+        <div class="logo-container">
+            <div class="logo-main" onclick="location.reload()">
+                <img src="frontend/assets/logo.svg" alt="Scratch C Logo" class="logo-image" onerror="this.style.display='none'; this.parentElement.innerHTML='<i class=\"fas fa-crown\"></i>';">
+            </div>
+            <div class="logo-text">SCRATCH C</div>
+            <div class="logo-subtext">EARN • CONNECT • ENJOY</div>
+            <div class="logo-tagline">#1 Platform for Digital Rewards</div>
+        </div>
+
+        <!-- Banner Section -->
+        <div class="banner-section">
+            <div class="banner-header">
+                <div class="banner-icon">
+                    <i class="fas fa-film"></i>
+                </div>
+                <div class="banner-title">Welcome to Scratch C!</div>
+            </div>
+            
+            <div class="banner-description">
+                Your ultimate entertainment and earning platform. Watch movies, read books, shop in marketplace, and earn real rewards!
+            </div>
+            
+            <div class="banner-image">
+                <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                     alt="Cinema Experience"
+                     onerror="this.src='https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80'">
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card" onclick="showFeature('read')">
+                    <i class="fas fa-book-open"></i>
+                    <span>Read & Earn</span>
+                </div>
+                <div class="feature-card" onclick="showFeature('cinema')">
+                    <i class="fas fa-video"></i>
+                    <span>Watch Movies</span>
+                </div>
+                <div class="feature-card" onclick="showFeature('shop')">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Shop & Sell</span>
+                </div>
+                <div class="feature-card" onclick="showFeature('chat')">
+                    <i class="fas fa-comments"></i>
+                    <span>Community Chat</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auth Container -->
+        <div class="auth-container">
+            <div class="welcome-message">
+                <div class="welcome-title">Start Your Journey!</div>
+                <div class="welcome-text">Join thousands earning rewards daily. No experience needed!</div>
+            </div>
+
+            <div id="loginForm">
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-user"></i> Username</label>
+                    <input type="text" class="form-input" id="username" placeholder="Enter your username" value="demo">
+                    <span class="input-icon"><i class="fas fa-user-circle"></i></span>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label"><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" class="form-input" id="password" placeholder="Enter your password" value="demo123">
+                    <span class="input-icon"><i class="fas fa-key"></i></span>
+                </div>
+                
+                <button class="auth-btn" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Login to Dashboard
+                </button>
+                
+                <button class="auth-btn btn-secondary" id="signupBtn">
+                    <i class="fas fa-user-plus"></i> Create New Account
+                </button>
+            </div>
+
+            <div id="errorContainer" class="error-message"></div>
+            <div id="successContainer" class="success-message"></div>
+
+            <!-- Quick Actions -->
+            <div style="margin-top: 20px; text-align: center;">
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="testConnection()" style="padding: 8px 15px; background: rgba(255,215,0,0.2); color: var(--primary); border: 1px solid var(--primary); border-radius: 8px; font-size: 12px; cursor: pointer;">
+                        <i class="fas fa-wifi"></i> Test Connection
+                    </button>
+                    <button onclick="useDemoAccount()" style="padding: 8px 15px; background: rgba(33,150,243,0.2); color: var(--accent); border: 1px solid var(--accent); border-radius: 8px; font-size: 12px; cursor: pointer;">
+                        <i class="fas fa-user-secret"></i> Demo Mode
+                    </button>
+                    <button onclick="toggleDebug()" style="padding: 8px 15px; background: rgba(255,64,129,0.2); color: var(--secondary); border: 1px solid var(--secondary); border-radius: 8px; font-size: 12px; cursor: pointer;">
+                        <i class="fas fa-bug"></i> Debug
+                    </button>
+                </div>
+            </div>
+
+            <!-- Debug Panel -->
+            <div class="debug-panel" id="debugPanel">
+                <div class="debug-header">
+                    <div class="debug-title">Debug Information</div>
+                    <button onclick="clearDebug()" style="background: none; border: none; color: var(--primary); cursor: pointer;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="debug-content" id="debugContent">
+                    <!-- Debug info will appear here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== UNBREAKABLE SCRATCH C AUTH SYSTEM =====
+        
+        // Configuration - ADJUST THESE FOR YOUR SETUP
+        const CONFIG = {
+            backendUrl: window.location.origin.includes('localhost') 
+                ? 'http://localhost:3000'  // Local development
+                : 'https://your-domain.com', // Production
+            
+            endpoints: {
+                test: '/api/test',
+                login: '/api/auth/login',
+                signup: '/api/auth/signup',
+                profile: '/api/auth/profile'
+            },
+            
+            // App Settings
+            appName: 'Scratch C',
+            version: '1.0.0',
+            
+            // Fallback Settings
+            enableDemoMode: true,
+            demoCredentials: {
+                username: 'demo_user',
+                password: 'demo123',
+                balance: 1000,
+                role: 'user'
+            },
+            
+            // Storage Keys
+            storage: {
+                token: 'scratchc_token',
+                user: 'scratchc_user',
+                session: 'scratchc_session'
+            }
+        };
+
+        // ===== CORE FUNCTIONS =====
+        
+        // Create starry background
+        function createStars() {
+            const stars = document.getElementById('stars');
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDuration = Math.random() * 5 + 3 + 's';
+                star.style.animationDelay = Math.random() * 5 + 's';
+                stars.appendChild(star);
+            }
+        }
+
+        // UI Helpers
+        function showLoading(message = 'Loading...') {
+            document.getElementById('loadingText').textContent = message;
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+
+        function showError(message, details = '') {
+            const container = document.getElementById('errorContainer');
+            container.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+            if (details) container.innerHTML += `<br><small>${details}</small>`;
+            container.style.display = 'block';
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                container.style.display = 'none';
+            }, 5000);
+            
+            logDebug('ERROR', message, details);
+        }
+
+        function showSuccess(message) {
+            const container = document.getElementById('successContainer');
+            container.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            container.style.display = 'block';
+            
+            setTimeout(() => {
+                container.style.display = 'none';
+            }, 3000);
+        }
+
+        function logDebug(type, message, data = null) {
+            const debugContent = document.getElementById('debugContent');
+            const timestamp = new Date().toLocaleTimeString();
+            let logEntry = `[${timestamp}] ${type}: ${message}`;
+            
+            if (data) {
+                logEntry += `\n${JSON.stringify(data, null, 2)}`;
+            }
+            
+            debugContent.innerHTML = logEntry + '\n\n' + debugContent.innerHTML;
+            
+            // Also log to console
+            console.log(`[${type}] ${message}`, data || '');
+        }
+
+        function toggleDebug() {
+            const panel = document.getElementById('debugPanel');
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function clearDebug() {
+            document.getElementById('debugContent').innerHTML = '';
+        }
+
+        // ===== API FUNCTIONS (WITH FALLBACKS) =====
+        
+        // Smart API caller with automatic retry and fallback
+        async function callApi(endpoint, options = {}) {
+            const url = CONFIG.backendUrl + CONFIG.endpoints[endpoint];
+            
+            // Default options
+            const defaultOptions = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                credentials: 'include', // Important for cookies
+                timeout: 5000 // 5 second timeout
+            };
+            
+            // Merge options
+            const config = { ...defaultOptions, ...options };
+            
+            logDebug('API', `Calling ${endpoint}`, { url, method: config.method || 'GET' });
+            
+            // Try with timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), config.timeout);
+            config.signal = controller.signal;
+            
+            try {
+                const response = await fetch(url, config);
+                clearTimeout(timeoutId);
+                
+                logDebug('API', `Response from ${endpoint}`, {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok
+                });
+                
+                // Try to parse response
+                let data;
+                const contentType = response.headers.get('content-type');
+                
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    logDebug('WARN', `Non-JSON response from ${endpoint}`, text.substring(0, 200));
+                    data = { success: false, raw: text };
+                }
+                
+                return {
+                    success: response.ok,
+                    status: response.status,
+                    data: data,
+                    response: response
+                };
+                
+            } catch (error) {
+                clearTimeout(timeoutId);
+                
+                if (error.name === 'AbortError') {
+                    logDebug('TIMEOUT', `Request to ${endpoint} timed out`);
+                    return {
+                        success: false,
+                        status: 0,
+                        data: { error: 'Request timeout', message: 'Server took too long to respond' }
+                    };
+                }
+                
+                logDebug('NETWORK', `Network error for ${endpoint}`, error.message);
+                return {
+                    success: false,
+                    status: 0,
+                    data: { error: 'Network error', message: 'Cannot connect to server' }
+                };
+            }
+        }
+
+        // Test connection to backend
+        async function testConnection() {
+            showLoading('Testing connection...');
+            
+            // Try multiple endpoints
+            const endpoints = ['test', 'profile', '/'];
+            let connected = false;
+            let details = '';
+            
+            for (const endpoint of endpoints) {
+                const result = await callApi(endpoint);
+                if (result.success) {
+                    connected = true;
+                    details = `Connected via ${endpoint}`;
+                    break;
+                }
+            }
+            
+            hideLoading();
+            
+            if (connected) {
+                showSuccess(`✅ Backend connected! ${details}`);
+            } else {
+                showError(
+                    '❌ Cannot connect to backend',
+                    'Please ensure: 1) Backend is running 2) Port 3000 is accessible 3) No firewall blocking'
+                );
+            }
+        }
+
+        // ===== AUTH FUNCTIONS =====
+        
+        // Handle login with multiple fallbacks
+        async function handleLogin() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showError('Please enter both username and password');
+                return;
+            }
+            
+            showLoading('Logging in...');
+            logDebug('AUTH', `Login attempt for: ${username}`);
+            
+            // Try real backend first
+            const loginData = { username, password };
+            const result = await callApi('login', {
+                method: 'POST',
+                body: JSON.stringify(loginData)
+            });
+            
+            if (result.success && result.data.success) {
+                // Success! Save token and user data
+                const { token, user } = result.data;
+                
+                // Save to localStorage
+                localStorage.setItem(CONFIG.storage.token, token || '');
+                localStorage.setItem(CONFIG.storage.user, JSON.stringify(user || {}));
+                localStorage.setItem(CONFIG.storage.session, Date.now().toString());
+                
+                logDebug('AUTH', 'Login successful', { username: user?.username });
+                
+                hideLoading();
+                showSuccess(`Welcome back, ${user?.username || username}!`);
+                
+                // Redirect to dashboard
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+                
+            } else if (CONFIG.enableDemoMode) {
+                // Fallback to demo mode
+                logDebug('AUTH', 'Using demo mode fallback');
+                useDemoAccount(username);
+            } else {
+                // Show error
+                hideLoading();
+                const errorMsg = result.data?.error || 
+                               result.data?.message || 
+                               'Login failed. Please check credentials.';
+                showError('Login Failed', errorMsg);
+            }
+        }
+
+        // Handle signup
+        async function handleSignup() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showError('Please enter both username and password');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError('Password must be at least 6 characters');
+                return;
+            }
+            
+            showLoading('Creating account...');
+            logDebug('AUTH', `Signup attempt for: ${username}`);
+            
+            const signupData = { username, password };
+            const result = await callApi('signup', {
+                method: 'POST',
+                body: JSON.stringify(signupData)
+            });
+            
+            if (result.success && result.data.success) {
+                const { token, user } = result.data;
+                
+                // Save to localStorage
+                localStorage.setItem(CONFIG.storage.token, token || '');
+                localStorage.setItem(CONFIG.storage.user, JSON.stringify(user || {}));
+                localStorage.setItem(CONFIG.storage.session, Date.now().toString());
+                
+                logDebug('AUTH', 'Signup successful', { username: user?.username });
+                
+                hideLoading();
+                showSuccess(`Welcome to ${CONFIG.appName}, ${user?.username || username}!`);
+                
+                // Redirect to dashboard
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+                
+            } else {
+                hideLoading();
+                
+                let errorMsg = 'Signup failed';
+                if (result.status === 409) {
+                    errorMsg = 'Username already exists';
+                } else if (result.status === 400) {
+                    errorMsg = 'Invalid registration data';
+                } else if (result.data?.error) {
+                    errorMsg = result.data.error;
+                }
+                
+                showError('Signup Failed', errorMsg);
+            }
+        }
+
+        // Demo account fallback
+        function useDemoAccount(customUsername = null) {
+            const username = customUsername || CONFIG.demoCredentials.username;
+            
+            logDebug('DEMO', 'Activating demo mode', { username });
+            
+            // Create demo user
+            const demoUser = {
+                _id: 'demo_' + Date.now(),
+                username: username,
+                email: 'demo@scratchc.com',
+                balance: CONFIG.demoCredentials.balance,
+                role: CONFIG.demoCredentials.role,
+                createdAt: new Date().toISOString(),
+                totalEarned: 2500,
+                totalSpent: 1500,
+                isDemo: true
+            };
+            
+            const demoToken = 'demo_token_' + Date.now();
+            
+            // Save to storage
+            localStorage.setItem(CONFIG.storage.token, demoToken);
+            localStorage.setItem(CONFIG.storage.user, JSON.stringify(demoUser));
+            localStorage.setItem(CONFIG.storage.session, 'demo_' + Date.now());
+            
+            hideLoading();
+            showSuccess(`🎮 Demo mode activated! Welcome ${username}`);
+            
+            // Redirect
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        }
+
+        // Feature showcase
+        function showFeature(feature) {
+            const messages = {
+                read: '📚 Read books and earn credits for every page!',
+                cinema: '🎬 Watch movies and vote for what plays next!',
+                shop: '🛒 Buy & sell items in our secure marketplace!',
+                chat: '💬 Connect with the community in real-time chat!'
+            };
+            
+            showSuccess(messages[feature] || 'Feature coming soon!');
+        }
+
+        // ===== INITIALIZATION =====
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log(`🚀 ${CONFIG.appName} v${CONFIG.version} Initializing...`);
+            
+            // Create background
+            createStars();
+            
+            // Setup button events
+            document.getElementById('loginBtn').addEventListener('click', handleLogin);
+            document.getElementById('signupBtn').addEventListener('click', handleSignup);
+            
+            // Handle Enter key
+            document.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const username = document.getElementById('username').value;
+                    const password = document.getElementById('password').value;
+                    
+                    if (username && password) {
+                        handleLogin();
+                    }
+                }
+            });
+            
+            // Auto-test connection
+            setTimeout(async () => {
+                const result = await callApi('test');
+                if (!result.success) {
+                    logDebug('INIT', 'Backend not reachable, demo mode available');
+                }
+            }, 1000);
+            
+            // Auto-focus username
+            setTimeout(() => {
+                document.getElementById('username').focus();
+            }, 500);
+            
+            // Welcome message
+            logDebug('INIT', `${CONFIG.appName} ready!`, {
+                backend: CONFIG.backendUrl,
+                demoMode: CONFIG.enableDemoMode,
+                time: new Date().toLocaleString()
+            });
+        });
+
+        // Global functions for buttons
+        window.testConnection = testConnection;
+        window.useDemoAccount = () => useDemoAccount();
+        window.toggleDebug = toggleDebug;
+        window.clearDebug = clearDebug;
+        window.showFeature = showFeature;
+    </script>
+</body>
+              </html>

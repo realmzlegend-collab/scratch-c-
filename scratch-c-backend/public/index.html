@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch C - Earn & Connect</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* [UI AND STRUCTURE PRESERVED - EXACTLY AS IN YOUR CODE] */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        :root {
+            --primary: #FFD700;
+            --secondary: #FF0000;
+            --accent: #0000FF;
+            --dark: #121212;
+            --light: #FFFFFF;
+            --gray: #2D2D2D;
+            --success: #00FF00;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --gradient: linear-gradient(135deg, #FFD700, #FFA500, #FF0000);
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .animated-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .bg-particle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--primary), transparent);
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            25% { transform: translateY(-100px) translateX(100px); opacity: 0.5; }
+            50% { transform: translateY(-200px) translateX(-100px); opacity: 0.3; }
+            75% { transform: translateY(-100px) translateX(-200px); opacity: 0.5; }
+            100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .logo-main {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            background: var(--gradient);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: pulse 2s infinite;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+            /* ADDED LOGO FIX */
+            background-image: url('logo.svg');
+            background-size: 80%;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .logo-main::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border-radius: 40px;
+            background: var(--gradient);
+            z-index: -1;
+            filter: blur(20px);
+            opacity: 0.5;
+        }
+
+        .logo-text {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--light);
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            display: none; /* Hide placeholder text to show SVG */
+        }
+
+        .logo-subtext {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .auth-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 40px 30px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: var(--shadow);
+            animation: slideUp 1s ease;
+        }
+
+        .telegram-info {
+            background: rgba(0, 136, 204, 0.1);
+            border: 2px solid #0088cc;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            animation: fadeIn 1s ease;
+        }
+
+        .telegram-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .telegram-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0088cc, #00aced);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .telegram-details {
+            text-align: left;
+            flex: 1;
+        }
+
+        .telegram-name {
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--light);
+        }
+
+        .telegram-username {
+            color: #0088cc;
+            font-size: 14px;
+        }
+
+        .telegram-badge {
+            background: #0088cc;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 20px;
+            background: var(--gradient);
+            border: none;
+            border-radius: 15px;
+            color: var(--dark);
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .auth-btn:active { transform: translateY(-2px); }
+
+        .success-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: none; justify-content: center; align-items: center;
+            z-index: 1000; animation: fadeIn 0.5s ease;
+        }
+
+        .success-content {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            padding: 50px; border-radius: 30px; text-align: center;
+            border: 2px solid var(--success); max-width: 400px; width: 90%;
+            animation: scaleIn 0.5s ease;
+        }
+
+        .success-icon {
+            width: 100px; height: 100px; background: var(--success);
+            border-radius: 50%; margin: 0 auto 30px; display: flex;
+            align-items: center; justify-content: center; font-size: 50px;
+            color: var(--dark); animation: bounce 1s ease;
+        }
+
+        .success-message { font-size: 24px; font-weight: bold; color: var(--success); margin-bottom: 20px; }
+        .success-details { color: rgba(255, 255, 255, 0.8); font-size: 16px; line-height: 1.6; }
+
+        .loading-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+            display: none; justify-content: center; align-items: center;
+            z-index: 1000; flex-direction: column;
+        }
+
+        .loading-spinner {
+            width: 80px; height: 80px; border: 5px solid rgba(255, 215, 0, 0.1);
+            border-radius: 50%; border-top-color: var(--primary);
+            animation: spin 1s linear infinite; margin-bottom: 30px;
+        }
+
+        .loading-text { font-size: 18px; color: var(--primary); font-weight: 600; letter-spacing: 2px; }
+
+        .welcome-message {
+            text-align: center; margin: 30px 0; padding: 20px;
+            background: rgba(255, 215, 0, 0.1); border-radius: 15px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .welcome-title { font-size: 24px; color: var(--primary); margin-bottom: 10px; font-weight: bold; }
+        .welcome-text { color: rgba(255, 255, 255, 0.8); font-size: 16px; line-height: 1.5; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-input {
+            width: 100%; padding: 15px; background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 215, 0, 0.1); border-radius: 12px;
+            color: var(--light); font-size: 16px; transition: all 0.3s ease; outline: none;
+        }
+
+        .form-input:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
+        .form-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+
+        .error-message {
+            color: var(--secondary); background: rgba(255, 0, 0, 0.1);
+            padding: 10px; border-radius: 10px; margin: 10px 0;
+            text-align: center; font-size: 14px; border: 1px solid rgba(255, 0, 0, 0.2);
+        }
+
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+        @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .auth-container { padding: 30px 20px; }
+            .logo-main { width: 100px; height: 100px; }
+            .logo-text { font-size: 36px; }
+            .logo-subtext { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="animated-bg" id="animatedBg"></div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText">Loading...</div>
+    </div>
+
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-content">
+            <div class="success-icon"><i class="fas fa-check"></i></div>
+            <div class="success-message" id="successMessage">Success!</div>
+            <div class="success-details" id="successDetails"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="logo-container">
+            <div class="logo-main">
+                </div>
+            <div class="logo-subtext">SCRATCH C</div>
+        </div>
+
+        <div class="auth-container">
+            <div class="welcome-message">
+                <div class="welcome-title">Welcome to Scratch C!</div>
+                <div class="welcome-text">Login to access your dashboard and rewards</div>
+            </div>
+
+            <div id="manualLogin">
+                <div class="form-group">
+                    <input type="text" class="form-input" id="username" placeholder="Username">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-input" id="password" placeholder="Password">
+                </div>
+                
+                <button class="auth-btn" onclick="handleAuth('login')">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                <button class="auth-btn" onclick="handleAuth('register')" style="background: var(--accent); margin-top: 10px;">
+                    <i class="fas fa-user-plus"></i> New Account? Register
+                </button>
+            </div>
+
+            <div id="errorContainer" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // BACKGROUND ANIMATION
+        function createBackgroundParticles() {
+            var bg = document.getElementById('animatedBg');
+            for (var i = 0; i < 20; i++) {
+                var particle = document.createElement('div');
+                particle.className = 'bg-particle';
+                var size = Math.random() * 100 + 50;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                bg.appendChild(particle);
+            }
+        }
+
+        function showLoading(msg) {
+            document.getElementById('loadingText').textContent = msg;
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
+
+        function showError(msg) {
+            const errDiv = document.getElementById('errorContainer');
+            errDiv.innerHTML = `<div class="error-message">${msg}</div>`;
+            errDiv.style.display = 'block';
+            setTimeout(() => { errDiv.style.display = 'none'; }, 3000);
+        }
+
+        function showSuccess(msg, details) {
+            document.getElementById('successMessage').textContent = msg;
+            document.getElementById('successDetails').textContent = details;
+            document.getElementById('successOverlay').style.display = 'flex';
+            setTimeout(() => { window.location.href = '/dashboard.html'; }, 1500);
+        }
+
+        // Updated authentication logic with correct API endpoints
+        async function handleAuth(type) {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            showLoading(type === 'login' ? 'Logging in...' : 'Creating account...');
+
+            try {
+                const response = await fetch(`/api/auth/${type}`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify({ 
+                        username, 
+                        password,
+                        email: username.includes('@') ? username : undefined
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    showSuccess(
+                        type === 'login' ? 'Welcome Back!' : 'Welcome!',
+                        `Happy earning, ${data.user.username}! You received 100 welcome credits.`
+                    );
+                } else {
+                    showError(data.error || 'Authentication failed');
+                }
+            } catch (err) {
+                showError('Server connection error. Please try again.');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        // Enter key support
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleAuth('login');
+            }
+        });
+
+        // Also support Enter on username field
+        document.getElementById('username').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('password').focus();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', createBackgroundParticles);
+    </script>
+</body>
+  </html>

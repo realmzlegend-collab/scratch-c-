@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch C - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== MODERN, PROFESSIONAL DESIGN ===== */
+        :root {
+            --primary: #FFD700;
+            --secondary: #FF4081;
+            --accent: #2196F3;
+            --dark: #0F0F23;
+            --light: #FFFFFF;
+            --success: #4CAF50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 40px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+        }
+
+        /* Logo */
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease;
+        }
+
+        .logo-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 25px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: var(--dark);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+            transition: transform 0.5s ease;
+        }
+
+        .logo-icon:hover {
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        .logo h1 {
+            font-size: 42px;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .logo p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px 20px 16px 50px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            color: var(--light);
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 18px;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin: 10px 0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #FF8C00);
+            color: var(--dark);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--accent), #21CBF3);
+            color: white;
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(33, 150, 243, 0.4);
+        }
+
+        /* Messages */
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 15px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .error {
+            background: rgba(255, 64, 129, 0.1);
+            border: 1px solid rgba(255, 64, 129, 0.3);
+            color: #FF4081;
+        }
+
+        .success {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: var(--success);
+        }
+
+        .info {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: var(--primary);
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 10, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 215, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin-bottom: 25px;
+        }
+
+        .loading-text {
+            color: var(--primary);
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .quick-actions button {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-actions button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Status Bar */
+        .status-bar {
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            font-size: 13px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .status-connected {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .status-disconnected {
+            color: #FF4081;
+            font-weight: 600;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .logo-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 36px;
+            }
+            
+            .logo h1 {
+                font-size: 36px;
+            }
+            
+            .btn {
+                padding: 16px;
+                font-size: 16px;
+            }
+            
+            .quick-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText">Connecting to server...</div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Logo -->
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-crown"></i>
+            </div>
+            <h1>SCRATCH C</h1>
+            <p>Real Accounts • Real Rewards • Real Experience</p>
+        </div>
+
+        <!-- Messages -->
+        <div class="message error" id="errorMessage"></div>
+        <div class="message success" id="successMessage"></div>
+        <div class="message info" id="infoMessage"></div>
+
+        <!-- Login Form -->
+        <div class="form-group">
+            <label><i class="fas fa-user"></i> YOUR USERNAME</label>
+            <div class="input-container">
+                <i class="fas fa-user-circle input-icon"></i>
+                <input type="text" id="username" placeholder="Choose your username" autocomplete="username">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label><i class="fas fa-lock"></i> YOUR PASSWORD</label>
+            <div class="input-container">
+                <i class="fas fa-key input-icon"></i>
+                <input type="password" id="password" placeholder="Create a strong password" autocomplete="current-password">
+            </div>
+        </div>
+
+        <!-- Main Buttons -->
+        <button class="btn btn-primary" onclick="handleLogin()" id="loginBtn">
+            <i class="fas fa-sign-in-alt"></i> LOGIN WITH YOUR ACCOUNT
+        </button>
+
+        <button class="btn btn-secondary" onclick="handleSignup()" id="signupBtn">
+            <i class="fas fa-user-plus"></i> CREATE NEW ACCOUNT
+        </button>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button onclick="testBackendConnection()">
+                <i class="fas fa-server"></i> Test Server
+            </button>
+            <button onclick="useDemoAccount()">
+                <i class="fas fa-user-secret"></i> Demo Mode
+            </button>
+            <button onclick="clearStorage()">
+                <i class="fas fa-trash-alt"></i> Clear Data
+            </button>
+        </div>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span id="connectionStatus">Checking server connection...</span>
+        </div>
+    </div>
+
+    <script>
+        // ===== REAL ACCOUNT SYSTEM =====
+        console.log('🎯 Scratch C - REAL Account System');
+        
+        // Backend Configuration
+        const BACKEND = {
+            // Your backend URL (adjust if needed)
+            url: 'http://localhost:3000',
+            endpoints: {
+                test: '/api/test',
+                login: '/api/auth/login',
+                signup: '/api/auth/signup'
+            },
+            timeout: 10000, // 10 seconds
+            retryCount: 2
+        };
+
+        // UI Functions
+        function showLoading(message) {
+            document.getElementById('loadingText').textContent = message;
+            document.getElementById('loading').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function showMessage(type, message) {
+            const element = document.getElementById(`${type}Message`);
+            element.innerHTML = `<i class="fas fa-${type === 'error' ? 'exclamation-circle' : type === 'success' ? 'check-circle' : 'info-circle'}"></i> ${message}`;
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+
+        function updateStatus(status, isConnected = false) {
+            const element = document.getElementById('connectionStatus');
+            element.innerHTML = `<i class="fas fa-${isConnected ? 'check-circle' : 'exclamation-triangle'}"></i> ${status}`;
+            element.className = isConnected ? 'status-connected' : 'status-disconnected';
+        }
+
+        // Clear localStorage
+        function clearStorage() {
+            localStorage.clear();
+            showMessage('info', 'All local data cleared. Page will reload.');
+            setTimeout(() => location.reload(), 1000);
+        }
+
+        // Test Backend Connection
+        async function testBackendConnection() {
+            showLoading('Testing backend connection...');
+            
+            try {
+                const response = await fetch(`${BACKEND.url}${BACKEND.endpoints.test}`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    hideLoading();
+                    showMessage('success', `✅ Backend is working! ${data.message || ''}`);
+                    updateStatus('Backend connected', true);
+                    return true;
+                } else {
+                    hideLoading();
+                    showMessage('error', `❌ Backend error (${response.status})`);
+                    updateStatus('Backend error', false);
+                    return false;
+                }
+            } catch (error) {
+                hideLoading();
+                showMessage('error', `❌ Cannot connect to backend: ${error.message}`);
+                updateStatus('Server offline', false);
+                return false;
+            }
+        }
+
+        // ===== REAL LOGIN FUNCTION =====
+        async function handleLogin() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showMessage('error', 'Please enter both username and password');
+                return;
+            }
+            
+            console.log(`🔐 Attempting REAL login for: ${username}`);
+            showLoading('Logging in with your account...');
+            
+            try {
+                // Try REAL backend login
+                const response = await fetch(`${BACKEND.url}${BACKEND.endpoints.login}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                console.log('Login response:', { status: response.status, data });
+                
+                if (response.ok && data.success) {
+                    // SUCCESS - Real account login
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    hideLoading();
+                    showMessage('success', `✅ Welcome back, ${data.user.username}!`);
+                    updateStatus('Logged in successfully', true);
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                    
+                } else {
+                    hideLoading();
+                    
+                    // Handle specific errors
+                    if (response.status === 401) {
+                        showMessage('error', 'Invalid username or password');
+                    } else if (response.status === 404) {
+                        showMessage('error', 'Account not found. Please sign up first.');
+                    } else {
+                        showMessage('error', data.error || 'Login failed. Please try again.');
+                    }
+                }
+                
+            } catch (error) {
+                hideLoading();
+                console.error('Login error:', error);
+                
+                if (error.name === 'TypeError') {
+                    showMessage('error', 'Cannot connect to server. Check if backend is running.');
+                    updateStatus('Server offline', false);
+                } else {
+                    showMessage('error', `Login error: ${error.message}`);
+                }
+            }
+        }
+
+        // ===== REAL SIGNUP FUNCTION =====
+        async function handleSignup() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showMessage('error', 'Please enter both username and password');
+                return;
+            }
+            
+            if (username.length < 3) {
+                showMessage('error', 'Username must be at least 3 characters');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('error', 'Password must be at least 6 characters');
+                return;
+            }
+            
+            console.log(`📝 Creating REAL account for: ${username}`);
+            showLoading('Creating your account...');
+            
+            try {
+                // Try REAL backend signup
+                const response = await fetch(`${BACKEND.url}${BACKEND.endpoints.signup}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                console.log('Signup response:', { status: response.status, data });
+                
+                if (response.ok && data.success) {
+                    // SUCCESS - Real account created
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    
+                    hideLoading();
+                    showMessage('success', `✅ Account created! Welcome ${data.user.username}!`);
+                    updateStatus('Account created', true);
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                    
+                } else {
+                    hideLoading();
+                    
+                    // Handle specific errors
+                    if (response.status === 409) {
+                        showMessage('error', 'Username already exists. Please choose another.');
+                    } else if (response.status === 400) {
+                        showMessage('error', 'Invalid data. Please check your input.');
+                    } else {
+                        showMessage('error', data.error || 'Signup failed. Please try again.');
+                    }
+                }
+                
+            } catch (error) {
+                hideLoading();
+                console.error('Signup error:', error);
+                
+                if (error.name === 'TypeError') {
+                    showMessage('error', 'Cannot connect to server. Backend may be offline.');
+                    updateStatus('Server offline', false);
+                    
+                    // Offer demo mode as fallback
+                    setTimeout(() => {
+                        if (confirm('Server unavailable. Would you like to use demo mode instead?')) {
+                            useDemoAccount();
+                        }
+                    }, 1000);
+                } else {
+                    showMessage('error', `Signup error: ${error.message}`);
+                }
+            }
+        }
+
+        // ===== DEMO MODE (FALLBACK ONLY) =====
+        function useDemoAccount() {
+            const username = document.getElementById('username').value.trim() || 'demo_user';
+            const password = document.getElementById('password').value || 'demo123';
+            
+            console.log(`🎮 Creating DEMO account for: ${username}`);
+            showLoading('Creating demo account...');
+            
+            // Create demo user data
+            const demoUser = {
+                _id: 'demo_' + Date.now(),
+                username: username,
+                email: `${username}@scratchc.com`,
+                balance: 1000,
+                role: 'user',
+                createdAt: new Date().toISOString(),
+                totalEarned: 2000,
+                totalSpent: 1000,
+                isDemo: true
+            };
+            
+            const demoToken = 'demo_token_' + Date.now();
+            
+            // Save to localStorage
+            localStorage.setItem('token', demoToken);
+            localStorage.setItem('user', JSON.stringify(demoUser));
+            
+            hideLoading();
+            showMessage('info', `🎮 Demo account created for ${username}. Some features may be limited.`);
+            updateStatus('Using demo mode', false);
+            
+            // Redirect to dashboard
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        }
+
+        // ===== INITIALIZATION =====
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Scratch C - REAL Accounts Ready');
+            
+            // Auto-test backend on load
+            setTimeout(async () => {
+                const isConnected = await testBackendConnection();
+                
+                if (isConnected) {
+                    showMessage('success', '✅ Backend connected! You can use real accounts.');
+                } else {
+                    showMessage('info', '⚠️ Backend offline. Real accounts unavailable. Use demo mode if needed.');
+                }
+            }, 1000);
+            
+            // Setup button events
+            document.getElementById('loginBtn').onclick = handleLogin;
+            document.getElementById('signupBtn').onclick = handleSignup;
+            
+            // Handle Enter key
+            document.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleLogin();
+                }
+            });
+            
+            // Auto-focus username field
+            setTimeout(() => {
+                document.getElementById('username').focus();
+            }, 500);
+            
+            // Show helpful info
+            setTimeout(() => {
+                showMessage('info', '💡 Use YOUR real username and password to create an account');
+            }, 2000);
+            
+            console.log('✅ Page ready for REAL account creation');
+        });
+
+        // Global functions for buttons
+        window.handleLogin = handleLogin;
+        window.handleSignup = handleSignup;
+        window.testBackendConnection = testBackendConnection;
+        window.useDemoAccount = useDemoAccount;
+        window.clearStorage = clearStorage;
+    </script>
+</body>
+  </html>

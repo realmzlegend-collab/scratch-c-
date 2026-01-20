@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch C - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== SIMPLE, WORKING THEME ===== */
+        :root {
+            --primary: #FFD700;
+            --secondary: #FF4081;
+            --accent: #2196F3;
+            --dark: #0a0a0a;
+            --light: #ffffff;
+            --gray: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: var(--light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+
+        .logo {
+            margin-bottom: 30px;
+        }
+
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 20px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: var(--dark);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: var(--light);
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), #FF6B00);
+            border: none;
+            border-radius: 10px;
+            color: var(--dark);
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: var(--accent);
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff6b6b;
+        }
+
+        .success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #4CAF50;
+        }
+
+        .info {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: var(--primary);
+        }
+
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 215, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .loading-text {
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .debug-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            font-size: 12px;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .debug-title {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .debug-content {
+            color: rgba(255, 255, 255, 0.7);
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .action-buttons button {
+            padding: 10px;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText">Loading...</div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Logo -->
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-crown"></i>
+            </div>
+            <h1>SCRATCH C</h1>
+            <div class="subtitle">Earn • Connect • Enjoy</div>
+        </div>
+
+        <!-- Messages -->
+        <div class="message error" id="errorMessage"></div>
+        <div class="message success" id="successMessage"></div>
+        <div class="message info" id="infoMessage"></div>
+
+        <!-- Login Form -->
+        <div id="loginForm">
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Username</label>
+                <input type="text" id="username" placeholder="Enter username" value="test">
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-lock"></i> Password</label>
+                <input type="password" id="password" placeholder="Enter password" value="test123">
+            </div>
+
+            <button onclick="handleLogin()" id="loginBtn">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+            
+            <button onclick="handleSignup()" class="secondary" id="signupBtn">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="action-buttons">
+            <button onclick="testConnection()" style="background: rgba(255,215,0,0.2); color: var(--primary);">
+                <i class="fas fa-wifi"></i> Test
+            </button>
+            <button onclick="useDemoMode()" style="background: rgba(33,150,243,0.2); color: var(--accent);">
+                <i class="fas fa-user-secret"></i> Demo
+            </button>
+            <button onclick="clearStorage()" style="background: rgba(255,64,129,0.2); color: var(--secondary);">
+                <i class="fas fa-trash"></i> Clear
+            </button>
+        </div>
+
+        <!-- Debug Panel -->
+        <div class="debug-panel" id="debugPanel">
+            <div class="debug-title">
+                <span>Debug Console</span>
+                <button onclick="clearDebug()" style="background: none; border: none; color: var(--primary); cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="debug-content" id="debugContent">
+                Scratch C Debug Console
+                =====================
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== SIMPLE, WORKING AUTH SYSTEM =====
+        
+        // Log to debug panel
+        function debugLog(message, data = null) {
+            const debugContent = document.getElementById('debugContent');
+            const timestamp = new Date().toLocaleTimeString();
+            let logEntry = `[${timestamp}] ${message}`;
+            
+            if (data) {
+                try {
+                    logEntry += `\n${JSON.stringify(data, null, 2)}`;
+                } catch {
+                    logEntry += `\n${data}`;
+                }
+            }
+            
+            debugContent.innerHTML = logEntry + '\n' + debugContent.innerHTML;
+            console.log(`[DEBUG] ${message}`, data || '');
+        }
+
+        // Show/hide loading
+        function showLoading(message = 'Loading...') {
+            document.getElementById('loadingText').textContent = message;
+            document.getElementById('loading').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        // Show messages
+        function showMessage(type, message) {
+            const element = document.getElementById(`${type}Message`);
+            element.textContent = message;
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, type === 'error' ? 5000 : 3000);
+        }
+
+        // Clear debug panel
+        function clearDebug() {
+            document.getElementById('debugContent').innerHTML = 'Debug Console Cleared\n=====================';
+        }
+
+        // Clear storage
+        function clearStorage() {
+            localStorage.clear();
+            sessionStorage.clear();
+            showMessage('success', 'Storage cleared!');
+            debugLog('Storage cleared');
+        }
+
+        // ===== BACKEND CONFIGURATION =====
+        // Try different backend URLs until one works
+        const BACKEND_URLS = [
+            'http://localhost:3000',      // Default backend port
+            'http://127.0.0.1:3000',      // Localhost IP
+            window.location.origin,        // Same origin
+            'http://localhost:5500'       // Live Server port
+        ];
+
+        // Test which backend URL works
+        async function findWorkingBackend() {
+            debugLog('Looking for working backend...');
+            
+            for (const url of BACKEND_URLS) {
+                try {
+                    debugLog(`Trying: ${url}`);
+                    const response = await fetch(`${url}/api/test`, {
+                        method: 'GET',
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        debugLog(`✅ Found working backend: ${url}`, data);
+                        return url;
+                    }
+                } catch (error) {
+                    debugLog(`❌ Failed: ${url}`, error.message);
+                }
+            }
+            
+            // If no backend found, use same origin
+            debugLog('⚠️ No backend found, using same origin');
+            return window.location.origin;
+        }
+
+        // Get API URL
+        let API_BASE_URL = window.location.origin;
+        
+        async function initBackend() {
+            showLoading('Finding backend...');
+            API_BASE_URL = await findWorkingBackend();
+            hideLoading();
+            
+            if (API_BASE_URL === window.location.origin) {
+                showMessage('info', 'Running in standalone mode. Using demo features.');
+            }
+        }
+
+        // ===== CORE AUTH FUNCTIONS =====
+        
+        // Test connection
+        async function testConnection() {
+            showLoading('Testing connection...');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/test`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                let data = {};
+                try {
+                    data = await response.json();
+                } catch {
+                    data = { text: await response.text() };
+                }
+                
+                hideLoading();
+                
+                if (response.ok) {
+                    showMessage('success', `✅ Backend connected!\n${data.message || 'API is working'}`);
+                    debugLog('Connection test successful', { status: response.status, data });
+                } else {
+                    showMessage('error', `❌ Backend error: ${response.status}\n${data.error || 'Check backend logs'}`);
+                    debugLog('Connection test failed', { status: response.status, data });
+                }
+            } catch (error) {
+                hideLoading();
+                showMessage('error', `❌ Cannot connect to backend\n${error.message}`);
+                debugLog('Connection test error', error);
+            }
+        }
+
+        // Handle login
+        async function handleLogin() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showMessage('error', 'Please enter username and password');
+                return;
+            }
+            
+            showLoading('Logging in...');
+            debugLog(`Login attempt: ${username}`);
+            
+            // Try real login first
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include', // Important for cookies
+                    body: JSON.stringify({ username, password })
+                });
+                
+                let data = {};
+                try {
+                    data = await response.json();
+                } catch {
+                    data = { error: 'Invalid response from server' };
+                }
+                
+                debugLog('Login response', { status: response.status, data });
+                
+                if (response.ok && data.success) {
+                    // Success! Save user data
+                    localStorage.setItem('token', data.token || 'demo_token');
+                    localStorage.setItem('user', JSON.stringify(data.user || {
+                        username: username,
+                        balance: 1000,
+                        role: 'user'
+                    }));
+                    
+                    hideLoading();
+                    showMessage('success', `Welcome back, ${username}!`);
+                    
+                    // Redirect after short delay
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                    
+                } else {
+                    // Try alternative login endpoint
+                    await tryAlternativeLogin(username, password);
+                }
+                
+            } catch (error) {
+                debugLog('Login error', error);
+                // If network error, try demo mode
+                await tryAlternativeLogin(username, password);
+            }
+        }
+
+        // Try alternative login methods
+        async function tryAlternativeLogin(username, password) {
+            debugLog('Trying alternative login...');
+            
+            // Method 1: Try without /api prefix
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        handleLoginSuccess(username, data);
+                        return;
+                    }
+                }
+            } catch (error) {
+                debugLog('Alternative login failed', error);
+            }
+            
+            // Method 2: Use demo mode
+            useDemoMode(username);
+        }
+
+        // Handle signup
+        async function handleSignup() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showMessage('error', 'Please enter username and password');
+                return;
+            }
+            
+            if (password.length < 4) {
+                showMessage('error', 'Password must be at least 4 characters');
+                return;
+            }
+            
+            showLoading('Creating account...');
+            debugLog(`Signup attempt: ${username}`);
+            
+            // Try real signup
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                let data = {};
+                try {
+                    data = await response.json();
+                } catch {
+                    data = { error: 'Invalid response' };
+                }
+                
+                debugLog('Signup response', { status: response.status, data });
+                
+                if (response.ok && data.success) {
+                    // Account created!
+                    localStorage.setItem('token', data.token || 'new_token');
+                    localStorage.setItem('user', JSON.stringify(data.user || {
+                        username: username,
+                        balance: 500,
+                        role: 'user'
+                    }));
+                    
+                    hideLoading();
+                    showMessage('success', `Account created! Welcome ${username}!`);
+                    
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                    
+                } else {
+                    hideLoading();
+                    const errorMsg = data.error || data.message || `Signup failed (${response.status})`;
+                    showMessage('error', errorMsg);
+                    
+                    // Suggest using demo mode
+                    setTimeout(() => {
+                        showMessage('info', 'Tip: Try using demo mode if signup fails');
+                    }, 3000);
+                }
+                
+            } catch (error) {
+                hideLoading();
+                debugLog('Signup error', error);
+                showMessage('error', `Cannot connect to server: ${error.message}`);
+                
+                // Auto-suggest demo mode
+                setTimeout(() => {
+                    if (confirm('Server unavailable. Use demo mode instead?')) {
+                        useDemoMode(username);
+                    }
+                }, 1000);
+            }
+        }
+
+        // Demo mode - ALWAYS WORKS
+        function useDemoMode(customUsername = null) {
+            hideLoading();
+            
+            const username = customUsername || document.getElementById('username').value.trim() || 'demo_user';
+            
+            debugLog('Activating demo mode', { username });
+            
+            // Create demo user data
+            const demoUser = {
+                _id: 'demo_' + Date.now(),
+                username: username,
+                email: `${username}@scratchc.com`,
+                balance: 1500,
+                role: 'user',
+                isDemo: true,
+                createdAt: new Date().toISOString(),
+                totalEarned: 2500,
+                totalSpent: 1000
+            };
+            
+            const demoToken = 'demo_token_' + Date.now();
+            
+            // Save to storage
+            localStorage.setItem('token', demoToken);
+            localStorage.setItem('user', JSON.stringify(demoUser));
+            sessionStorage.setItem('auth', 'demo');
+            
+            showMessage('success', `🎮 Demo mode activated! Welcome ${username}`);
+            debugLog('Demo mode activated', demoUser);
+            
+            // Redirect to dashboard
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        }
+
+        // Handle login success
+        function handleLoginSuccess(username, data) {
+            localStorage.setItem('token', data.token || 'success_token');
+            localStorage.setItem('user', JSON.stringify(data.user || { username }));
+            
+            hideLoading();
+            showMessage('success', `✅ Login successful! Welcome ${username}`);
+            
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        }
+
+        // ===== INITIALIZATION =====
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Scratch C Initializing...');
+            debugLog('Page loaded');
+            
+            // Initialize backend
+            await initBackend();
+            
+            // Setup button events
+            document.getElementById('loginBtn').onclick = handleLogin;
+            document.getElementById('signupBtn').onclick = handleSignup;
+            
+            // Handle Enter key
+            document.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleLogin();
+                }
+            });
+            
+            // Auto-fill test credentials
+            setTimeout(() => {
+                if (!document.getElementById('username').value) {
+                    document.getElementById('username').value = 'test';
+                    document.getElementById('password').value = 'test123';
+                }
+                document.getElementById('username').focus();
+            }, 500);
+            
+            // Show quick help
+            setTimeout(() => {
+                showMessage('info', '💡 Tip: Use "test" / "test123" or click "Demo"');
+            }, 2000);
+            
+            debugLog('Initialization complete');
+        });
+
+        // Global functions
+        window.testConnection = testConnection;
+        window.useDemoMode = useDemoMode;
+        window.clearStorage = clearStorage;
+        window.clearDebug = clearDebug;
+        window.handleLogin = handleLogin;
+        window.handleSignup = handleSignup;
+    </script>
+</body>
+          </html>

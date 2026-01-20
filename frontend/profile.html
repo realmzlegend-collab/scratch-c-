@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Scratch C</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Existing styles preserved */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        :root {
+            --primary: #FFD700; --secondary: #FF0000; --accent: #0000FF;
+            --dark: #121212; --light: #FFFFFF; --gray: #2D2D2D; --success: #00FF00;
+        }
+        body { 
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%); 
+            color: var(--light); 
+            min-height: 100vh; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .profile-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 40px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        
+        .profile-pic-container { 
+            position: relative; 
+            width: 150px; 
+            height: 150px; 
+            margin: 0 auto 20px; 
+        }
+        .profile-pic { 
+            width: 100%; 
+            height: 100%; 
+            border-radius: 50%; 
+            border: 4px solid var(--primary); /* YELLOW BORDER */
+            background: var(--gray); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 60px; 
+            color: var(--primary); 
+            cursor: pointer; 
+            transition: 0.3s;
+        }
+        
+        /* Visual Feedback Class */
+        .access-granted { 
+            border-color: var(--success) !important; 
+            box-shadow: 0 0 20px var(--success); 
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px var(--success); }
+            50% { box-shadow: 0 0 30px var(--success); }
+        }
+        
+        .modal { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background: rgba(0,0,0,0.95); 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 2000; 
+        }
+        .modal-content { 
+            background: var(--dark); 
+            padding: 30px; 
+            border-radius: 20px; 
+            border: 2px solid var(--primary); 
+            width: 90%; 
+            max-width: 350px; 
+            text-align: center; 
+        }
+        .secret-input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 15px 0; 
+            background: #222; 
+            border: 1px solid var(--primary); 
+            color: white; 
+            border-radius: 8px; 
+            text-align: center; 
+            font-size: 16px;
+        }
+        
+        .profile-header {
+            margin-bottom: 30px;
+        }
+        
+        .profile-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .info-label {
+            color: #888;
+        }
+        
+        .info-value {
+            color: var(--primary);
+            font-weight: bold;
+        }
+        
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: var(--primary);
+            color: var(--dark);
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            margin-top: 20px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: var(--dark);
+        }
+        
+        .btn-secondary {
+            background: var(--accent);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-pic-container">
+                <div class="profile-pic" id="profileTrigger">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+            <h2 id="userName" style="color: var(--primary)">Loading...</h2>
+            <div id="userBalance" style="font-size: 24px; margin-top: 10px; font-weight: bold;">₦0.00</div>
+            <div style="color: #888; font-size: 14px; margin-top: 5px;">Tap profile picture 7 times for admin access</div>
+        </div>
+        
+        <div class="profile-info">
+            <div class="info-row">
+                <span class="info-label">Username:</span>
+                <span class="info-value" id="usernameDisplay">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email:</span>
+                <span class="info-value" id="emailDisplay">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Role:</span>
+                <span class="info-value" id="roleDisplay">User</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Joined:</span>
+                <span class="info-value" id="joinedDisplay">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Status:</span>
+                <span class="info-value" id="statusDisplay">Active</span>
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <button class="btn btn-primary" onclick="window.location.href='/dashboard.html'">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </button>
+            <button class="btn btn-secondary" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+        </div>
+    </div>
+
+    <div id="pinModal" class="modal">
+        <div class="modal-content">
+            <h3 style="color: var(--primary);">🔒 Security PIN</h3>
+            <p style="color: #888; margin: 10px 0; font-size: 14px;">Enter the 6-digit PIN</p>
+            <input type="password" id="pinInput" class="secret-input" placeholder="Enter PIN" maxlength="6">
+            <button onclick="verifyPin()" style="background:var(--primary); padding:12px; width:100%; border:none; border-radius:8px; font-weight:bold; margin-top:10px;">
+                <i class="fas fa-key"></i> Verify PIN
+            </button>
+        </div>
+    </div>
+
+    <div id="cmdModal" class="modal">
+        <div class="modal-content">
+            <h3 style="color: var(--success);">⚡ System Command</h3>
+            <p style="color: #888; margin: 10px 0; font-size: 14px;">Enter the activation command</p>
+            <input type="text" id="cmdInput" class="secret-input" placeholder="Enter Command">
+            <button onclick="verifyCommand()" style="background:var(--success); padding:12px; width:100%; border:none; border-radius:8px; font-weight:bold; margin-top:10px;">
+                <i class="fas fa-play"></i> Execute Command
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Authentication check
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/index.html';
+                return;
+            }
+            
+            // Load user data
+            loadUserData();
+        });
+        
+        // Load user data from API
+        async function loadUserData() {
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch('/api/auth/profile', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    updateProfileUI(data.user);
+                } else {
+                    localStorage.clear();
+                    window.location.href = '/index.html';
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+        
+        function updateProfileUI(user) {
+            document.getElementById('userName').textContent = user.username;
+            document.getElementById('userBalance').textContent = `₦${(user.balance || 0).toLocaleString()}`;
+            document.getElementById('usernameDisplay').textContent = user.username;
+            document.getElementById('emailDisplay').textContent = user.email || 'Not set';
+            document.getElementById('roleDisplay').textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+            document.getElementById('joinedDisplay').textContent = new Date(user.createdAt).toLocaleDateString();
+            document.getElementById('statusDisplay').textContent = user.status.charAt(0).toUpperCase() + user.status.slice(1);
+            
+            // Update profile picture with initial
+            const profilePic = document.querySelector('.profile-pic i');
+            if (profilePic) {
+                profilePic.textContent = user.username.charAt(0).toUpperCase();
+            }
+        }
+        
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/index.html';
+        }
+        
+        // Secret Logic: 7 Taps -> 5 Sec Green Border -> PIN Modal
+        const trigger = document.getElementById('profileTrigger');
+        let tapCount = 0;
+        let lastTapTime = 0;
+        let accessTimer = null;
+
+        trigger.addEventListener('click', () => {
+            const currentTime = new Date().getTime();
+            if (currentTime - lastTapTime < 400) { 
+                tapCount++; 
+            } else { 
+                tapCount = 1; 
+            }
+            lastTapTime = currentTime;
+
+            if (tapCount === 7) {
+                tapCount = 0;
+                trigger.classList.add('access-granted');
+                
+                // Clear any existing timer
+                if (accessTimer) clearTimeout(accessTimer);
+                
+                accessTimer = setTimeout(() => {
+                    trigger.classList.remove('access-granted');
+                    document.getElementById('pinModal').style.display = 'flex';
+                    document.getElementById('pinInput').focus();
+                }, 5000); // WAIT 5 SECONDS
+            }
+        });
+
+        function verifyPin() {
+            const pin = document.getElementById('pinInput').value;
+            if (pin === "141612") {
+                document.getElementById('pinModal').style.display = 'none';
+                document.getElementById('cmdModal').style.display = 'flex';
+                document.getElementById('cmdInput').focus();
+            } else { 
+                alert('❌ Invalid PIN');
+                location.reload(); 
+            }
+        }
+
+        // UPDATED WITH CORRECT API ENDPOINT
+        async function grantAdminAccess(pin, command) {
+            const token = localStorage.getItem('token');
+            
+            try {
+                const response = await fetch('/api/admin/grant-access', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ pin, command })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    alert('✅ ' + (data.message || 'Admin access granted!'));
+                    
+                    // Update localStorage user data
+                    const user = JSON.parse(localStorage.getItem('user'));
+                    user.role = 'admin';
+                    localStorage.setItem('user', JSON.stringify(user));
+                    
+                    // Update UI
+                    document.getElementById('roleDisplay').textContent = 'Admin';
+                    
+                    // Redirect to admin page after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '/admin.html';
+                    }, 2000);
+                } else {
+                    const data = await response.json();
+                    alert('❌ ' + (data.error || 'Failed to grant admin access'));
+                    location.reload();
+                }
+            } catch (error) {
+                console.error('Grant admin access error:', error);
+                alert('❌ Network error. Please try again.');
+                location.reload();
+            }
+        }
+
+        function verifyCommand() {
+            const command = document.getElementById('cmdInput').value;
+            if (command === "MENU BOUNCER 0 REALLY 1") {
+                // Call backend to grant admin access
+                grantAdminAccess("141612", command);
+            } else { 
+                alert('❌ Invalid Command');
+                location.reload(); 
+            }
+        }
+        
+        // Close modals on outside click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                    location.reload();
+                }
+            });
+        });
+        
+        // Enter key support for modals
+        document.getElementById('pinInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifyPin();
+            }
+        });
+        
+        document.getElementById('cmdInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifyCommand();
+            }
+        });
+        
+        // Escape key to close modals
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+            }
+        });
+    </script>
+</body>
+  </html>
